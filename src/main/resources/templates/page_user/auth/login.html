@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Quỹ Từ Thiện UTE</title>
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="text-center mb-4">
+            <h3 class="text-primary"><i class="fas fa-hand-holding-heart me-2"></i>UTE Charity</h3>
+            <p class="text-muted">Đăng nhập để tiếp tục</p>
+        </div>
+
+        <!-- Alert error -->
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+        <div th:if="${param.registerSuccess}" class="alert alert-success" role="alert">Đăng ký thành công! Vui lòng đăng
+            nhập.</div>
+
+        <form action="/dang-nhap" method="post">
+            <!-- Username input -->
+            <div class="mb-4">
+                <label class="form-label" for="username" style="font-weight: 500;">Tên đăng nhập</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tên đăng nhập"
+                    required />
+            </div>
+
+            <!-- Password input -->
+            <div class="mb-4">
+                <label class="form-label" for="password" style="font-weight: 500;">Mật khẩu</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu"
+                    required />
+            </div>
+
+            <!-- 2 column grid layout -->
+            <div class="row mb-4">
+                <div class="col d-flex justify-content-center">
+                    <!-- Checkbox -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="form2Example31" checked />
+                        <label class="form-check-label" for="form2Example31"> Ghi nhớ đăng nhập </label>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <!-- Simple link -->
+                    <a href="/quen-mat-khau">Quên mật khẩu?</a>
+                </div>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary btn-block mb-4">Đăng nhập</button>
+
+            <!-- Register buttons -->
+            <div class="text-center">
+                <p>Chưa có tài khoản? <a href="/dang-ky">Đăng ký ngay</a></p>
+            </div>
+        </form>
+    </div>
+
+    <!-- MDB -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+</body>
+
+</html>

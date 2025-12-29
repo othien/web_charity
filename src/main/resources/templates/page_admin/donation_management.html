@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đóng góp - Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        @media (min-width: 991.98px) {
+            main {
+                padding-left: 260px;
+            }
+        }
+
+        .stat-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .badge-status {
+            padding: 0.4em 0.8em;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div th:replace="page_admin/layout/sidebar :: sidebar"></div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="navbar-brand mb-0 h5">Quản lý đóng góp</span>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-user me-1"></i> <span
+                                th:text="${user}">Admin</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main style="margin-top: 58px;">
+        <div class="container-fluid pt-4 px-4">
+            <!-- Filter & Stats -->
+            <div class="card stat-card mb-4">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5 class="card-title mb-0">
+                                Tổng doanh thu: <span class="text-success fw-bold"
+                                    th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' VND'">0
+                                    VND</span>
+                            </h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button type="button" class="btn btn-success btn-sm" onclick="exportDetailedReport()">
+                                <i class="fas fa-file-alt me-1"></i> Xuất báo cáo chi tiết
+                            </button>
+                        </div>
+                    </div>
+
+                    <form class="row g-3 align-items-end" method="get" action="/admin/donations">
+                        <div class="col-md-2">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" name="searchTerm" placeholder="Mã GD..."
+                                th:value="${searchTerm}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Dự án</label>
+                            <select class="form-select" name="projectId">
+                                <option value="">Tất cả dự án</option>
+                                <option th:each="p : ${projects}" th:value="${p.id}" th:text="${p.title}"
+                                    th:selected="${p.id == selectedProjectId}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Danh mục</label>
+                            <select class="form-select" name="category">
+                                <option value="ALL">Tất cả</option>
+                                <option value="Y tế" th:selected="${selectedCategory == 'Y tế'}">Y tế</option>
+                                <option value="Trẻ em" th:selected="${selectedCategory == 'Trẻ em'}">Trẻ em</option>
+                                <option value="Giáo dục" th:selected="${selectedCategory == 'Giáo dục'}">Giáo dục
+                                </option>
+                                <option value="Thiên tai" th:selected="${selectedCategory == 'Thiên tai'}">Thiên tai
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">Quý</label>
+                            <select class="form-select" name="quarter">
+                                <option value="">--</option>
+                                <option value="1" th:selected="${selectedQuarter == 1}">Q1</option>
+                                <option value="2" th:selected="${selectedQuarter == 2}">Q2</option>
+                                <option value="3" th:selected="${selectedQuarter == 3}">Q3</option>
+                                <option value="4" th:selected="${selectedQuarter == 4}">Q4</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">Tháng</label>
+                            <select class="form-select" name="month">
+                                <option value="">--</option>
+                                <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${m}"
+                                    th:selected="${m == selectedMonth}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">Năm</label>
+                            <select class="form-select" name="year">
+                                <option value="">--</option>
+                                <option th:each="y : ${#numbers.sequence(2023, 2030)}" th:value="${y}" th:text="${y}"
+                                    th:selected="${y == selectedYear}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-1"></i>
+                                Lọc</button>
+                            <a href="/admin/donations" class="btn btn-secondary w-100 mt-1 btn-sm">Đặt lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Donation List -->
+            <div class="card stat-card table-container">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Mã GD</th>
+                                    <th>Người đóng góp</th>
+                                    <th>Email</th>
+                                    <th>Dự án</th>
+                                    <th>Số tiền</th>
+                                    <th>Thời gian</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="d : ${donations}">
+                                    <td><code th:text="${d.orderId}">ORD001</code></td>
+                                    <td th:text="${d.user != null} ? ${d.user.fullname} : 'Ẩn danh'">Người dùng</td>
+                                    <td th:text="${d.user != null} ? ${d.user.email} : '-'">email@example.com</td>
+                                    <td>
+                                        <span th:if="${d.artical != null}"
+                                            th:text="${#strings.abbreviate(d.artical.title, 30)}">Tên dự án</span>
+                                        <span th:if="${d.artical == null}" class="text-muted">-</span>
+                                    </td>
+                                    <td class="text-success fw-bold"
+                                        th:text="${#numbers.formatDecimal(d.totalPrice, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                                        100,000₫</td>
+                                    <td
+                                        th:text="${d.paymentTime != null} ? ${#temporals.format(d.paymentTime, 'dd/MM/yyyy HH:mm')} : '-'">
+                                        01/01/2024 10:00</td>
+                                    <td>
+                                        <span class="badge badge-status"
+                                            th:classappend="${d.paymentStatus == 1} ? 'bg-success' : 'bg-warning text-dark'"
+                                            th:text="${d.paymentStatus == 1} ? 'Thành công' : 'Chờ xử lý'">Thành
+                                            công</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(donations)}">
+                                    <td colspan="7" class="text-center text-muted py-4">Không có giao dịch nào</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center"
+                    th:if="${totalPages > 1}">
+                    <span class="text-muted">Trang <span th:text="${currentPage + 1}">1</span> / <span
+                            th:text="${totalPages}">1</span></span>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/donations(page=${currentPage - 1}, searchTerm=${searchTerm}, projectId=${selectedProjectId}, category=${selectedCategory}, quarter=${selectedQuarter}, month=${selectedMonth}, year=${selectedYear})}">Trước</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/donations(page=${currentPage + 1}, searchTerm=${searchTerm}, projectId=${selectedProjectId}, category=${selectedCategory}, quarter=${selectedQuarter}, month=${selectedMonth}, year=${selectedYear})}">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Summary Footer -->
+            <div class="card mt-3 mb-4 bg-light">
+                <div class="card-body text-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>
+                        Tổng đóng góp: <strong class="text-primary me-3" th:text="${totalDonations}">0</strong>
+                        <span class="text-muted">|</span>
+                        <i class="fas fa-money-bill-wave text-success ms-3 me-2"></i>
+                        Tổng tiền: <strong class="text-success"
+                            th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</strong>
+                    </h5>
+                </div>
+            </div>
+
+            <script>
+                // Filter Validation Logic
+                document.addEventListener('DOMContentLoaded', function () {
+                    const quarterSelect = document.querySelector('select[name="quarter"]');
+                    const monthSelect = document.querySelector('select[name="month"]');
+                    const yearSelect = document.querySelector('select[name="year"]');
+                    const form = document.querySelector('form[action="/admin/donations"]');
+
+                    // Mutually exclusive Quarter and Month
+                    if (quarterSelect && monthSelect && yearSelect) {
+                        quarterSelect.addEventListener('change', function () {
+                            if (this.value) {
+                                monthSelect.value = ""; // Reset month if quarter selected
+                                yearSelect.required = true; // Require year
+                                if (!yearSelect.value) yearSelect.classList.add('is-invalid');
+                            } else {
+                                if (!monthSelect.value) {
+                                    yearSelect.required = false;
+                                    yearSelect.classList.remove('is-invalid');
+                                }
+                            }
+                        });
+
+                        monthSelect.addEventListener('change', function () {
+                            if (this.value) {
+                                quarterSelect.value = ""; // Reset quarter if month selected
+                                yearSelect.required = true; // Require year
+                                if (!yearSelect.value) yearSelect.classList.add('is-invalid');
+                            } else {
+                                if (!quarterSelect.value) {
+                                    yearSelect.required = false;
+                                    yearSelect.classList.remove('is-invalid');
+                                }
+                            }
+                        });
+
+
+                        yearSelect.addEventListener('change', function () {
+                            if (this.value) {
+                                yearSelect.classList.remove('is-invalid');
+                            }
+                        });
+
+                        // Validate on submit
+                        form.addEventListener('submit', function (e) {
+                            if ((quarterSelect.value || monthSelect.value) && !yearSelect.value) {
+                                e.preventDefault();
+                                alert('Vui lòng chọn Năm khi lọc theo Quý hoặc Tháng!');
+                                yearSelect.focus();
+                                yearSelect.classList.add('is-invalid');
+                            }
+                        });
+                    }
+                });
+
+                function getReportPeriod() {
+                    const quarterSelect = document.querySelector('select[name="quarter"]');
+                    const monthSelect = document.querySelector('select[name="month"]');
+                    const yearSelect = document.querySelector('select[name="year"]');
+
+                    const quarter = quarterSelect ? quarterSelect.value : '';
+                    const month = monthSelect ? monthSelect.value : '';
+                    const year = yearSelect ? yearSelect.value : '';
+
+                    if (quarter && year) return `Quý ${quarter} năm ${year}`;
+                    if (month && year) return `Tháng ${month} năm ${year}`;
+                    if (year) return `Năm ${year}`;
+                    return "Toàn bộ thời gian (hoặc theo bộ lọc hiện tại)";
+                }
+
+                // Export Detailed Report Function
+                function exportDetailedReport() {
+                    const totalRevenue = document.querySelector('.text-success.fw-bold').innerText;
+                    const reportPeriod = getReportPeriod();
+
+                    var reportContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Báo cáo chi tiết đóng góp - UTE Charity</title>
+                <style>
+                    body { font-family: 'Times New Roman', serif; margin: 40px; }
+                    .header { text-align: center; margin-bottom: 30px; position: relative; }
+                    .header h1 { color: #0066cc; margin-bottom: 5px; }
+                    .header h2 { color: #333; margin-top: 0; }
+                    .info { margin-bottom: 20px; }
+                    .info p { margin: 5px 0; }
+                    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+                    th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+                    th { background-color: #0066cc; color: white; }
+                    tr:nth-child(even) { background-color: #f2f2f2; }
+                    .summary { margin-top: 30px; padding: 15px; background: #e8f4fc; border: 1px solid #0066cc; }
+                    .footer { margin-top: 50px; display: flex; justify-content: space-between; }
+                    .signature { text-align: center; width: 40%; }
+                    .signature .line { margin-top: 80px; border-top: 1px solid #000; width: 80%; margin-left: auto; margin-right: auto; }
+                    
+                    /* Print Button Style */
+                    .print-btn {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        padding: 10px 20px;
+                        background-color: #28a745;
+                        color: white;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-family: Arial, sans-serif;
+                        font-weight: bold;
+                    }
+                    .print-btn:hover { background-color: #218838; }
+
+                    /* Hide specific elements when printing */
+                    @media print {
+                        .print-btn { display: none !important; }
+                        body { margin: 0; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <button class="print-btn" onclick="window.print()">
+                        <i class="fas fa-print"></i> In Báo Cáo
+                    </button>
+                    <h1>UTE CHARITY</h1>
+                    <h2>BÁO CÁO CHI TIẾT ĐÓNG GÓP</h2>
+                </div>
+                
+                <div class="info">
+                    <p><strong>Ngày lập báo cáo:</strong> ${new Date().toLocaleDateString('vi-VN')}</p>
+                    <p><strong>Người lập:</strong> Quản trị viên</p>
+                    <p><strong>Kỳ báo cáo:</strong> ${reportPeriod}</p>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã GD</th>
+                            <th>Người đóng góp</th>
+                            <th>Dự án</th>
+                            <th>Số tiền</th>
+                            <th>Thời gian</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${getTableRows()}
+                    </tbody>
+                </table>
+                
+                <div class="summary">
+                    <strong>TỔNG KẾT:</strong><br>
+                    - Tổng doanh thu hiển thị: ${totalRevenue}
+                </div>
+                
+                <div class="footer">
+                    <div class="signature">
+                        <p><strong>Người lập báo cáo</strong></p>
+                        <p class="line">(Ký và ghi rõ họ tên)</p>
+                    </div>
+                    <div class="signature">
+                        <p><strong>Người phê duyệt</strong></p>
+                        <p class="line">(Ký và ghi rõ họ tên)</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+                    `;
+
+                    var reportWindow = window.open('', '_blank');
+                    reportWindow.document.write(reportContent);
+                    reportWindow.document.close();
+                }
+
+                function getTableRows() {
+                    var rows = document.querySelectorAll('.table-container tbody tr');
+                    var html = '';
+                    var stt = 1;
+                    rows.forEach(function (row) {
+                        if (row.cells.length > 2) { // Ensure it's a data row
+                            html += '<tr>';
+                            html += '<td>' + stt + '</td>';
+                            html += '<td>' + row.cells[0].innerText + '</td>'; // Mã GD
+                            html += '<td>' + row.cells[1].innerText + '</td>'; // Tên
+                            html += '<td>' + row.cells[3].innerText + '</td>'; // Dự án
+                            html += '<td>' + row.cells[4].innerText + '</td>'; // Tiền
+                            html += '<td>' + row.cells[5].innerText + '</td>'; // Thời gian
+                            html += '</tr>';
+                            stt++;
+                        }
+                    });
+                    return html;
+                }
+            </script>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+</body>
+
+</html>

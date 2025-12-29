@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo dự án</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        @media (min-width: 991.98px) {
+            main {
+                padding-left: 260px;
+            }
+        }
+
+        .stat-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .project-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div th:replace="page_admin/layout/sidebar :: sidebar"></div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="navbar-brand mb-0 h5">Báo cáo kết quả dự án</span>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-user me-1"></i> <span
+                                th:text="${user}">Admin</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main style="margin-top: 58px;">
+        <div class="container-fluid pt-4 px-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h6 class="section-header"><i class="fas fa-clipboard-check me-2"></i>Đăng tải báo cáo hoàn
+                                thành</h6>
+
+                            <!-- Project Info Summary -->
+                            <div class="project-info">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3">
+                                        <img th:src="${project.img}" alt="Thumbnail" class="img-fluid rounded"
+                                            style="max-height: 100px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h5 class="mb-1" th:text="${project.title}">Tên dự án</h5>
+                                        <p class="mb-1">
+                                            <span class="badge bg-success me-2" th:text="${project.status}">Đã hoàn
+                                                thành</span>
+                                            <span class="text-muted" th:text="${project.displaycategory}">Danh
+                                                mục</span>
+                                        </p>
+                                        <p class="mb-0">
+                                            <strong class="text-success"
+                                                th:text="${#numbers.formatDecimal(project.amountRaised, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</strong>
+                                            <span class="text-muted">/ <span
+                                                    th:text="${#numbers.formatDecimal(project.goalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form action="/admin/projects/report/save" method="post">
+                                <input type="hidden" name="projectId" th:value="${project.id}">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Hình ảnh báo cáo <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="reportImage" required
+                                        placeholder="https://example.com/report-image.jpg"
+                                        th:value="${project.reportImage}">
+                                    <div class="form-text">Hình ảnh kết quả sau khi hoàn thành dự án (trao quà, xây dựng
+                                        xong, v.v.)</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Nội dung báo cáo <span
+                                            class="text-danger">*</span></label>
+                                    <textarea class="form-control" name="reportContent" rows="6" required
+                                        placeholder="Mô tả chi tiết kết quả đã đạt được, số tiền đã giải ngân, đối tượng được hỗ trợ..."
+                                        th:text="${project.reportContent}"></textarea>
+                                    <div class="form-text">Nội dung này sẽ được hiển thị cho người dùng xem ở trang chi
+                                        tiết dự án</div>
+                                </div>
+
+                                <div class="alert alert-warning" th:if="${project.hasReport()}">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Dự án này đã có báo cáo. Lưu sẽ cập nhật báo cáo hiện tại.
+                                </div>
+
+                                <div class="d-flex justify-content-between mt-4">
+                                    <a href="/admin/projects" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i> Quay lại
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-paper-plane me-1"></i> Đăng báo cáo
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+</body>
+
+</html>

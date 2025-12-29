@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Phản hồi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Quản lý Phản hồi Người Dùng</h2>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <form th:action="@{/dashboard_contact}" method="get" class="d-flex">
+                    <input type="text" name="searchTerm" th:value="${searchTerm}" class="form-control me-2"
+                        placeholder="Tìm kiếm theo Tên, Email, Nội dung...">
+                    <button type="submit" class="btn btn-primary">Tìm</button>
+                </form>
+            </div>
+            <div class="col-md-6 text-end">
+                <div class="btn-group" role="group">
+                    <a th:href="@{/dashboard_contact(topic='ALL')}" class="btn btn-outline-primary"
+                        th:classappend="${selectedTopic == null || selectedTopic == 'ALL'} ? 'active'">Tất cả</a>
+                    <a th:href="@{/dashboard_contact(topic='Đăng ký tình nguyện viên')}" class="btn btn-outline-primary"
+                        th:classappend="${selectedTopic == 'Đăng ký tình nguyện viên'} ? 'active'">Tình nguyện viên</a>
+                    <a th:href="@{/dashboard_contact(topic='Liên hệ giúp đỡ')}" class="btn btn-outline-primary"
+                        th:classappend="${selectedTopic == 'Liên hệ giúp đỡ'} ? 'active'">Xin giúp đỡ</a>
+                    <a th:href="@{/dashboard_contact(topic='Tin nhắn chung')}" class="btn btn-outline-primary"
+                        th:classappend="${selectedTopic == 'Tin nhắn chung'} ? 'active'">Tin nhắn chung</a>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Họ và Tên</th>
+                    <th>Email</th>
+                    <th>SĐT</th>
+                    <th>Nội Dung</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dòng mẫu cho dữ liệu -->
+                <tr th:each="contactModels : ${contactModels}">
+                    <td th:text="${contactModels.id}"></td>
+                    <td th:text="${contactModels.user_fullname}"></td>
+                    <td th:text="${contactModels.user_email}"></td>
+                    <td th:text="${contactModels.user_phone}"></td>
+                    <td th:text="${contactModels.user_comment}"></td>
+                    <form th:action="@{/contact/delete/{id_delete}(id_delete=${contactModels.id})}" method="post"
+                        id="deleteForm">
+                        <td><button type="button" onclick="openDeleteModal(this.form.action)"
+                                class="btn btn-danger btn-sm">Xóa</button></td>
+                    </form>
+                </tr>
+            </tbody>
+        </table>
+
+        <nav aria-label="Page navigation" th:if="${totalPages > 0}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{/dashboard_contact(page=${currentPage - 1}, topic=${selectedTopic}, searchTerm=${searchTerm})}">Previous</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link"
+                        th:href="@{/dashboard_contact(page=${i}, topic=${selectedTopic}, searchTerm=${searchTerm})}"
+                        th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{/dashboard_contact(page=${currentPage + 1}, topic=${selectedTopic}, searchTerm=${searchTerm})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Xác nhận xóa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa mục này không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">Có</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openDeleteModal(action) {
+            document.getElementById('deleteForm').action = action;
+            $('#confirmDeleteModal').modal('show');
+        }
+        function confirmDelete() {
+            document.getElementById('deleteForm').submit();
+        }
+
+    </script>
+    <!-- Ensure jQuery is included first and only once -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Then include Bootstrap and MDB -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js"></script>
+</body>
+
+</html>

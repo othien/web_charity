@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${news.id != null} ? 'Sửa tin tức' : 'Thêm tin tức mới'">Tin tức</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        @media (min-width: 991.98px) {
+            main {
+                padding-left: 260px;
+            }
+        }
+
+        .stat-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div th:replace="page_admin/layout/sidebar :: sidebar"></div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="navbar-brand mb-0 h5"
+                    th:text="${news.id != null} ? 'Sửa tin tức' : 'Thêm tin tức mới'">Form tin tức</span>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-user me-1"></i> <span
+                                th:text="${user}">Admin</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main style="margin-top: 58px;">
+        <div class="container-fluid pt-4 px-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card stat-card">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i> Thông tin tin tức</h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/admin/news/save}" method="post" th:object="${news}">
+                                <input type="hidden" th:field="*{id}">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" th:field="*{title_news}" required
+                                        placeholder="Nhập tiêu đề tin tức">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả ngắn</label>
+                                    <textarea class="form-control" th:field="*{sub_titlenews}" rows="3"
+                                        placeholder="Mô tả ngắn gọn nội dung tin tức"></textarea>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label">Link hình ảnh</label>
+                                        <input type="text" class="form-control" th:field="*{img_news}"
+                                            placeholder="https://example.com/image.jpg">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Ngày cập nhật</label>
+                                        <input type="date" class="form-control" th:field="*{date_update}">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Link bài viết gốc (nếu có)</label>
+                                    <input type="text" class="form-control" th:field="*{url_artical}"
+                                        placeholder="https://example.com/article">
+                                </div>
+
+                                <div class="d-flex justify-content-between mt-4">
+                                    <a href="/admin/news" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i> Quay lại
+                                    </a>
+                                    <button type="button" class="btn btn-primary btn-lg" onclick="confirmSave()">
+                                        <i class="fas fa-save me-1"></i> Lưu tin tức
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmSave() {
+            // Validate form first
+            const form = document.querySelector('form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            Swal.fire({
+                title: 'Xác nhận lưu tin tức?',
+                text: 'Bạn có chắc chắn muốn lưu tin tức này?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1976d2',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-save"></i> Lưu tin tức',
+                cancelButtonText: '<i class="fas fa-times"></i> Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Đang lưu...',
+                        text: 'Vui lòng đợi trong giây lát',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Submit form using fetch API
+                    const formData = new FormData(form);
+
+                    fetch('/admin/news/save', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (response.redirected || response.ok) {
+                                // Show success message then redirect
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thành công!',
+                                    text: 'Tin tức đã được lưu thành công',
+                                    confirmButtonColor: '#1976d2',
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                }).then(() => {
+                                    window.location.href = '/admin/news';
+                                });
+                            } else {
+                                throw new Error('Có lỗi xảy ra');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: 'Không thể lưu tin tức: ' + error.message,
+                                confirmButtonColor: '#dc3545'
+                            });
+                        });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

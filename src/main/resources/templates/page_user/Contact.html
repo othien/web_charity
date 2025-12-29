@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liên Hệ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <!-- Intro settings -->
+    <style>
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: #ffefdb !important;
+        }
+
+        header {
+            padding-top: 120px;
+            /* Bù lại chiều cao của navbar */
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            /* Đảm bảo không có khoảng cách giữa menu và dropdown */
+        }
+
+        /* Dropdown Style */
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        .nav-link.dropdown-toggle {
+            padding: 10px 15px;
+            color: #000;
+            font-weight: 500;
+            border-radius: 50px;
+            /* Tạo hình tròn cho nút dropdown */
+            transition: all 0.3s ease;
+            /* Hiệu ứng chuyển màu mượt mà */
+        }
+
+        /* Hover effect */
+        .nav-link.dropdown-toggle:hover {
+            background-color: #ff6f61;
+            /* Màu nền khi hover */
+            color: white;
+            /* Màu chữ khi hover */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            /* Hiệu ứng bóng đổ */
+        }
+
+        /* Dropdown menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Show dropdown menu on hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Dropdown item */
+        .dropdown-item {
+            padding: 12px 20px;
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect on dropdown items */
+        .dropdown-item:hover {
+            background-color: #ff6f61;
+            color: white;
+            transform: translateX(5px);
+            /* Hiệu ứng chuyển động */
+        }
+
+        /* For small screens */
+        @media (max-width: 768px) {
+            .nav-link.dropdown-toggle {
+                padding: 10px;
+            }
+
+            .dropdown-item {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-4" style="margin-top: 100px">Liên Hệ & Yêu Cầu Hỗ Trợ</h2>
+
+        <!-- Tabs for Contact vs Help Request -->
+        <ul class="nav nav-pills mb-3 justify-content-center" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="pills-contact-tab" data-bs-toggle="pill" href="#pills-contact" role="tab"
+                    aria-controls="pills-contact" aria-selected="true">Liên hệ
+                    chung</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="pills-help-tab" data-bs-toggle="pill" href="#pills-help" role="tab"
+                    aria-controls="pills-help" aria-selected="false">Gửi yêu cầu hỗ trợ</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+            <!-- Contact Form -->
+            <div class="tab-pane fade show active" id="pills-contact" role="tabpanel"
+                aria-labelledby="pills-contact-tab">
+                <form id="contactForm" method="post" th:action="@{/insert/contact}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Họ và Tên</label>
+                        <input type="text" class="form-control" id="name" name="name"
+                            placeholder="Nhập họ và tên của bạn" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email"
+                            placeholder="Nhập email của bạn" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Số Điện Thoại</label>
+                        <input type="tel" class="form-control" id="phone" name="phone"
+                            placeholder="Nhập số điện thoại của bạn" required pattern="[0-9]{10,11}">
+                        <small class="text-muted">Ví dụ: 0901234567</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Nội Dung</label>
+                        <textarea class="form-control" id="message" name="message" rows="5"
+                            placeholder="Viết nội dung tại đây" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Gửi Tin Nhắn</button>
+                </form>
+            </div>
+
+            <!-- Help Request Form -->
+            <div class="tab-pane fade" id="pills-help" role="tabpanel" aria-labelledby="pills-help-tab">
+                <div class="alert alert-info text-center">
+                    Hãy cung cấp thông tin chi tiết về hoàn cảnh cần giúp đỡ. Chúng tôi sẽ xác minh và liên hệ sớm nhất.
+                </div>
+                <form method="post" th:action="@{/insert/help-request}">
+                    <h5 class="mb-3 text-primary">Thông tin người cần giúp đỡ (Hoàn cảnh)</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Họ tên người cần giúp (*)</label>
+                            <input type="text" class="form-control" name="beneficiaryName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Số điện thoại liên hệ (*)</label>
+                            <input type="text" class="form-control" name="beneficiaryPhone" required>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3 text-primary mt-4">Thông tin người báo tin (Bạn)</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Họ tên của bạn (*)</label>
+                            <input type="text" class="form-control" name="reporterName" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Số điện thoại của bạn (*)</label>
+                            <input type="text" class="form-control" name="reporterPhone" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Email của bạn</label>
+                            <input type="email" class="form-control" name="reporterEmail"
+                                th:value="${session.user != null ? session.user.email : ''}"
+                                th:readonly="${session.user != null}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mối quan hệ với hoàn cảnh (*)</label>
+                        <select class="form-control" name="relationship" required>
+                            <option value="Bản thân">Bản thân</option>
+                            <option value="Người thân/Gia đình">Người thân/Gia đình</option>
+                            <option value="Hàng xóm/Người quen">Hàng xóm/Người quen</option>
+                            <option value="Tổ chức/Cơ quan">Tổ chức/Cơ quan</option>
+                            <option value="Người qua đường">Người qua đường</option>
+                        </select>
+                    </div>
+
+                    <h5 class="mb-3 text-primary mt-4">Chi tiết hoàn cảnh</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả hoàn cảnh khó khăn và lý do cần giúp đỡ (*)</label>
+                        <textarea class="form-control" name="description" rows="6" placeholder="Mô tả chi tiết..."
+                            required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label"><i class="fas fa-image me-2 text-info"></i>Hình ảnh xác thực (nếu
+                            có)</label>
+                        <input type="text" class="form-control" name="verificationImage"
+                            placeholder="Nhập link hình ảnh (VD: https://example.com/image.jpg)">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Bạn có thể upload hình lên
+                            <a href="https://imgbb.com/" target="_blank" class="text-primary">imgbb.com</a>
+                            hoặc <a href="https://imgur.com/" target="_blank" class="text-primary">imgur.com</a>
+                            rồi dán link vào đây để xác thực hoàn cảnh.
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning btn-block btn-lg text-white">
+                        <i class="fas fa-paper-plane me-2"></i>Gửi Yêu Cầu Hỗ Trợ
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Include Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check URL parameters for success messages
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get('contactSuccess') === 'true') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Gửi thành công!',
+                text: 'Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi sớm nhất có thể.',
+                confirmButtonColor: '#3B71CA',
+                timer: 4000,
+                timerProgressBar: true
+            });
+            // Remove parameter from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        if (urlParams.get('helpRequestSuccess') === 'true') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Đã gửi yêu cầu!',
+                text: 'Yêu cầu hỗ trợ của bạn đã được gửi. Chúng tôi sẽ xác minh và liên hệ sớm nhất.',
+                confirmButtonColor: '#FFA900',
+                timer: 4000,
+                timerProgressBar: true
+            });
+            // Remove parameter from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
+    /*]]>*/
+</script>
+
+</html>

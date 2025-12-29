@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thông Báo Quan Trọng từ Hệ Thống Quỹ Từ Thiện UTE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        h3 {
+            color: #007bff;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h3>Thông Báo Quan Trọng từ Hệ Thống Quỹ Từ Thiện UTE</h3>
+        <p th:text="${message}"></p>
+        <p class="footer">
+            Cảm ơn bạn đã đồng hành cùng chúng tôi trong các hoạt động từ thiện. Hệ thống Quỹ Từ Thiện UTE luôn cam kết
+            sử dụng quỹ ủng hộ vào các hoạt động giúp đỡ cộng đồng và hỗ trợ những hoàn cảnh khó khăn. Nếu bạn có bất kỳ
+            câu hỏi nào hoặc muốn biết thêm thông tin, vui lòng liên hệ với chúng tôi qua email hoặc điện thoại.
+        </p>
+    </div>
+</body>
+
+</html>

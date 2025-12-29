@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.thymeleaf.org ">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <style>
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            /* Đảm bảo menu luôn nằm trên các thành phần khác */
+            background-color: #ffefdb !important;
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            /* Đảm bảo không có khoảng cách giữa menu và dropdown */
+        }
+
+        /* Dropdown Style */
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        .nav-link.dropdown-toggle {
+            padding: 10px 15px;
+            color: #000;
+            font-weight: 500;
+            border-radius: 50px;
+            /* Tạo hình tròn cho nút dropdown */
+            transition: all 0.3s ease;
+            /* Hiệu ứng chuyển màu mượt mà */
+        }
+
+        /* Hover effect */
+        .nav-link.dropdown-toggle:hover {
+            background-color: #ff6f61;
+            /* Màu nền khi hover */
+            color: white;
+            /* Màu chữ khi hover */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            /* Hiệu ứng bóng đổ */
+        }
+
+        /* Dropdown menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Show dropdown menu on hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Dropdown item */
+        .dropdown-item {
+            padding: 12px 20px;
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect on dropdown items */
+        .dropdown-item:hover {
+            background-color: #ff6f61;
+            color: white;
+            transform: translateX(5px);
+            /* Hiệu ứng chuyển động */
+        }
+
+        /* For small screens */
+        @media (max-width: 768px) {
+            .nav-link.dropdown-toggle {
+                padding: 10px;
+            }
+
+            .dropdown-item {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Thanh điều hướng -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container" style="margin-top: 100px; margin-bottom: 50px;">
+        <h1 class="section-title text-center mb-5">GIỚI THIỆU VỀ QUỸ TỪ THIỆN UTE</h1>
+
+        <div class="content">
+
+            <p>Chào mừng bạn đến với Quỹ Từ Thiện UTE!</p>
+            <p>Chúng tôi là một nhóm sinh viên đến từ trường Đại học Sư phạm Kỹ thuật TP.HCM. Xuất thân từ môi trường kỹ
+                thuật, nơi mọi thứ luôn đòi hỏi sự chính xác và thực tế, chúng tôi hiểu rằng: "Công nghệ chỉ thực sự có
+                giá trị khi nó phục vụ con người và kết nối những trái tim".</p>
+            <p>Dự án này ra đời từ những trăn trở khi chứng kiến những mảnh đời còn nhiều cơ cực, những em nhỏ chưa được
+                vẹn tròn giấc mơ đến trường, hay những vùng quê oằn mình sau bão lũ.</p>
+            <h3 class="subheading mt-4">Sứ mệnh của chúng tôi:</h3>
+            <ul>
+                <li><b>Trẻ em & Hoàn cảnh khó khăn:</b> Mang đến sự hỗ trợ kịp thời để không ai bị bỏ lại phía sau.</li>
+                <li><b>Bệnh hiểm nghèo:</b> Tiếp thêm nguồn lực và hy vọng cho những cuộc chiến giành lại sự sống.</li>
+                <li><b>Cứu trợ thiên tai:</b> Là cầu nối nhanh nhất đưa sự giúp đỡ đến vùng tâm dịch, tâm bão.</li>
+                <li><b>Giáo dục & Môi trường:</b> Đầu tư vào tri thức và bảo vệ "mái nhà chung" cho thế hệ mai sau.</li>
+            </ul>
+
+            <p>Tại đây, chúng tôi cam kết sự <b>Minh bạch – Tận tâm – Hiệu quả</b>. Mỗi đóng góp của bạn, dù nhỏ nhất,
+                đều được chúng tôi trân trọng và chuyển giao trực tiếp đến đúng đối tượng cần giúp đỡ.</p>
+
+            <div class="text-center mt-5">
+                <a th:href="@{/trang-chu}" class="btn btn-primary btn-lg"><i class="fas fa-arrow-left"></i> Quay lại
+                    Trang Chủ</a>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- Include Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+<!-- MDB -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js"></script>
+<script>
+    // Hiệu ứng mở menu thả xuống khi hover
+    document.querySelectorAll('.nav-item.dropdown').forEach(function (dropdown) {
+        dropdown.addEventListener('mouseenter', function () {
+            const menu = this.querySelector('.dropdown-menu');
+            menu.style.display = 'block';
+            menu.style.opacity = '1';
+        });
+
+        dropdown.addEventListener('mouseleave', function () {
+            const menu = this.querySelector('.dropdown-menu');
+            menu.style.opacity = '0';
+            setTimeout(() => (menu.style.display = 'none'), 300);
+        });
+    });
+
+    // Thêm hiệu ứng hover cho các liên kết
+    document.querySelectorAll('.nav-link').forEach(function (link) {
+        link.addEventListener('mouseenter', function () {
+            this.style.backgroundColor = '#007bff'; // Màu nền hover
+            this.style.color = '#fff'; // Màu chữ khi hover
+        });
+        link.addEventListener('mouseleave', function () {
+            this.style.backgroundColor = ''; // Xóa màu nền hover
+            this.style.color = '#000'; // Màu chữ ban đầu
+        });
+    });
+</script>
+
+</html>

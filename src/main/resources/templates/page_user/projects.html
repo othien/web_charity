@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.thymeleaf.org ">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự án - Quỹ từ thiện UTE</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <!-- Intro settings -->
+    <style>
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            /* Đảm bảo menu luôn nằm trên các thành phần khác */
+            background-color: #ffefdb !important;
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            /* Đảm bảo không có khoảng cách giữa menu và dropdown */
+        }
+
+        .project {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .card {
+            margin-bottom: 30px;
+            /* Khoảng cách giữa các card */
+            border: none;
+            /* Bỏ viền card */
+            border-radius: 10px;
+            /* Bo góc card */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            /* Đổ bóng cho card */
+            transition: transform 0.2s;
+            /* Hiệu ứng khi hover */
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            /* Hiệu ứng nhấc card lên khi hover */
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            /* Kích thước tiêu đề lớn hơn */
+            font-weight: bold;
+            /* Đậm tiêu đề */
+        }
+
+        .card-text {
+            margin-bottom: 15px;
+            /* Khoảng cách dưới của text */
+        }
+
+        .btn {
+            background-color: #007bff;
+            /* Màu nền của nút */
+            color: white;
+            /* Màu chữ trên nút */
+            border-radius: 5px;
+            /* Bo góc nút */
+            padding: 10px 20px;
+            /* Padding cho nút */
+            transition: background-color 0.3s;
+            /* Hiệu ứng chuyển màu */
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            /* Màu nền khi hover */
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            /* Cho phép các card xuống dòng */
+        }
+
+        .col-md-4 {
+            display: flex;
+            /* Thiết lập flexbox cho cột */
+            justify-content: center;
+            /* Căn giữa nội dung */
+        }
+
+        .card {
+            flex: 1;
+            /* Chiếm đều không gian */
+            display: flex;
+            flex-direction: column;
+            /* Để các phần tử bên trong sắp xếp theo chiều dọc */
+            justify-content: space-between;
+            /* Tạo khoảng cách giữa các phần tử */
+            margin-bottom: 30px;
+            /* Khoảng cách giữa các card */
+            border: none;
+            /* Bỏ viền card */
+            border-radius: 10px;
+            /* Bo góc card */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            /* Đổ bóng cho card */
+            transition: transform 0.2s;
+            /* Hiệu ứng khi hover */
+        }
+
+        .card-body {
+            flex-grow: 1;
+            /* Để card-body chiếm hết không gian còn lại */
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Dropdown Style */
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        .nav-link.dropdown-toggle {
+            padding: 10px 15px;
+            color: #000;
+            font-weight: 500;
+            border-radius: 50px;
+            /* Tạo hình tròn cho nút dropdown */
+            transition: all 0.3s ease;
+            /* Hiệu ứng chuyển màu mượt mà */
+        }
+
+        /* Hover effect */
+        .nav-link.dropdown-toggle:hover {
+            background-color: #ff6f61;
+            /* Màu nền khi hover */
+            color: white;
+            /* Màu chữ khi hover */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            /* Hiệu ứng bóng đổ */
+        }
+
+        /* Dropdown menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Show dropdown menu on hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Dropdown item */
+        .dropdown-item {
+            padding: 12px 20px;
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect on dropdown items */
+        .dropdown-item:hover {
+            background-color: #ff6f61;
+            color: white;
+            transform: translateX(5px);
+            /* Hiệu ứng chuyển động */
+        }
+
+        /* For small screens */
+        @media (max-width: 768px) {
+            .nav-link.dropdown-toggle {
+                padding: 10px;
+            }
+
+            .dropdown-item {
+                font-size: 0.9em;
+            }
+        }
+
+        /* Filter and Search Styles */
+        .filter-section {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .filter-buttons .btn {
+            margin: 5px;
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .filter-buttons .btn.active,
+        .filter-buttons .btn:hover {
+            background-color: #ff6f61;
+            color: white;
+            border-color: #ff6f61;
+        }
+
+        .search-container input {
+            border-radius: 20px 0 0 20px;
+            border: 1px solid #ced4da;
+            padding: 10px 20px;
+        }
+
+        .search-container button {
+            border-radius: 0 20px 20px 0;
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            padding: 0 25px;
+        }
+
+        .search-container button:hover {
+            background-color: #e65b50;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Thanh điều hướng -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <!-- Phần Chiến Dịch -->
+
+
+    <section class="text-center my-5">
+        <div class="container" style="margin-top: 100px;">
+            <h2 class="font-weight-bold mb-4">Các Dự Án Từ Thiện</h2>
+
+            <!-- Filter and Search Section -->
+            <div class="filter-section">
+                <!-- (Search form remains same, reusing existing code) -->
+                <form action="/du-an" method="get">
+                    <div class="row align-items-center">
+                        <!-- Search Bar -->
+                        <div class="col-md-5 mb-3 mb-md-0">
+                            <div class="search-container d-flex">
+                                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm dự án..."
+                                    th:value="${keyword}">
+                                <input type="hidden" name="category" th:value="${selectedCategory}">
+                                <button type="submit"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Filter Buttons -->
+                        <div class="col-md-7">
+                            <div class="filter-buttons d-flex flex-wrap justify-content-center justify-content-md-end">
+                                <a href="/du-an" class="btn"
+                                    th:classappend="${selectedCategory == null} ? 'active' : ''">Tất cả</a>
+                                <a href="/du-an?category=Y tế" class="btn"
+                                    th:classappend="${selectedCategory == 'Y tế'} ? 'active' : ''">Y tế</a>
+                                <a href="/du-an?category=Trẻ em" class="btn"
+                                    th:classappend="${selectedCategory == 'Trẻ em'} ? 'active' : ''">Trẻ em</a>
+                                <a href="/du-an?category=Giáo dục" class="btn"
+                                    th:classappend="${selectedCategory == 'Giáo dục'} ? 'active' : ''">Giáo dục</a>
+                                <a href="/du-an?category=Thiên tai" class="btn"
+                                    th:classappend="${selectedCategory == 'Thiên tai'} ? 'active' : ''">Thiên tai</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabs Navs -->
+            <ul class="nav nav-tabs nav-fill mb-4" id="projectTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="active-tab" data-mdb-toggle="tab" href="#active-projects" role="tab"
+                        aria-controls="active-projects" aria-selected="true"
+                        style="font-weight: bold; font-size: 1.1em;">
+                        Đang gây quỹ <span class="badge bg-danger ms-1" th:text="${activeCampaigns.size()}">0</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="ended-tab" data-mdb-toggle="tab" href="#ended-projects" role="tab"
+                        aria-controls="ended-projects" aria-selected="false"
+                        style="font-weight: bold; font-size: 1.1em; color: gray;">
+                        Dự án đã kết thúc <span class="badge bg-secondary ms-1"
+                            th:text="${endedCampaigns.size()}">0</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="projectTabsContent">
+
+                <!-- Active Projects Tab -->
+                <div class="tab-pane fade show active" id="active-projects" role="tabpanel"
+                    aria-labelledby="active-tab">
+                    <p class="lead" th:if="${activeCampaigns.empty}">
+                        Không có dự án đang gây quỹ nào phù hợp.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-4 mb-4" th:each="campaign : ${activeCampaigns}">
+                            <!-- Project Card (Active) -->
+                            <div class="card project shadow h-100" th:data-category="${campaign.displaycategory}"
+                                style="display: flex; flex-direction: column; justify-content: space-between;
+                                    border: 1px solid #ddd; border-radius: 8px; overflow: hidden; transition: transform 0.3s;">
+                                <!-- Image -->
+                                <div style="height: 250px; overflow: hidden; position: relative;">
+                                    <img th:src="${campaign.img}" class="card-img-top w-100" alt="Chiến dịch"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                    <span class="badge bg-danger" style="position: absolute; top: 10px; right: 10px;"
+                                        th:text="${campaign.displaycategory}">Danh mục</span>
+                                    <!-- Goal reached badge -->
+                                    <span th:if="${campaign.goalReached}" class="badge bg-success"
+                                        style="position: absolute; top: 10px; left: 10px; font-size: 0.9em;">
+                                        <i class="fas fa-check-circle me-1"></i>Đã đủ quỹ
+                                    </span>
+                                    <!-- Heart Icon Overlay - Bottom Right -->
+                                    <a th:href="@{'/follow-project?id=' + ${campaign.id}}" class="btn btn-link p-0"
+                                        style="position: absolute; bottom: 10px; right: 10px; z-index: 10; text-decoration: none;">
+                                        <i th:class="${followedProjectIds != null and followedProjectIds.contains(campaign.id)} ? 'fas fa-heart text-danger fa-2x' : 'far fa-heart text-white fa-2x'"
+                                            style="text-shadow: 0 2px 5px rgba(0,0,0,0.5);"></i>
+                                    </a>
+                                </div>
+                                <!-- Content -->
+                                <div class="card-body d-flex flex-column" style="padding: 15px;">
+                                    <h5 class="card-title" th:text="${campaign.title}"
+                                        style="font-size: 1.1em; font-weight: bold; color: #333; text-align: center; margin: 10px 0;">
+                                    </h5>
+
+                                    <!-- Countdown or Goal Reached -->
+                                    <p th:if="${campaign.goalReached}" class="card-text"
+                                        style="font-size: 1em; font-weight: bold; text-align: center; color: #28a745;
+                                        background-color: #d4edda; border: 2px solid #28a745; padding: 10px 20px;
+                                        border-radius: 5px; display: inline-block; width: fit-content; margin: 0 auto 15px auto;">
+                                        <i class="fas fa-check-circle me-1"></i>Đã đạt mục tiêu!
+                                    </p>
+                                    <p th:unless="${campaign.goalReached}" class="card-text countdown"
+                                        style="font-size: 1em; font-weight: bold; text-align: center; color: #1e90ff;
+                                        background-color: #e7f5ff; border: 2px solid #1e90ff; padding: 10px 20px;
+                                        border-radius: 5px; display: inline-block; width: fit-content; margin: 0 auto 15px auto;"
+                                        th:attr="data-enddate=${#temporals.format(campaign.endDate, 'dd/MM/yyyy')}">
+                                        Đang tính toán...
+                                    </p>
+
+                                    <p class="card-text"
+                                        th:text="'Đã đạt: ' + ${#numbers.formatDecimal(campaign.amountRaised, 0, 'COMMA', 0, 'POINT')} + ' đ'"
+                                        style="font-size: 0.9em; font-weight: bold; text-align: center; color: cadetblue; margin-bottom: 5px;">
+                                    </p>
+                                    <p class="card-text"
+                                        th:text="'Mục tiêu: ' + ${#numbers.formatDecimal(campaign.goalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"
+                                        style="font-size: 0.9em; font-weight: bold; text-align: center; color: #8b2323; margin-bottom: 5px;">
+                                    </p>
+
+
+                                    <div class="progress" style="height: 10px; margin-bottom: 20px;">
+                                        <div class="progress-bar bg-danger" role="progressbar"
+                                            th:style="'width: ' + ${(campaign.amountRaised * 100.0) / campaign.goalAmount} + '%'"
+                                            aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+
+                                    <a th:href="@{'/du-an/' + ${campaign.id}}" class="btn btn-primary"
+                                        style="background-color: #0056b3; color: white; margin-top: auto; margin-bottom: 10px; border-radius: 5px; border: none;">
+                                        Xem chi tiết
+                                    </a>
+                                    <a th:href="@{/thanh-toan}" class="btn btn-primary"
+                                        style="background-color: #8b2323; border-color: #8b2323; color: white; border-radius: 5px; border: none;">
+                                        Quyên góp
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ended Projects Tab -->
+                <div class="tab-pane fade" id="ended-projects" role="tabpanel" aria-labelledby="ended-tab">
+                    <p class="lead" th:if="${endedCampaigns.empty}">
+                        Không có dự án nào đã kết thúc.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-4 mb-4" th:each="campaign : ${endedCampaigns}">
+                            <!-- Project Card (Ended) -->
+                            <div class="card project shadow h-100" th:data-category="${campaign.displaycategory}"
+                                style="display: flex; flex-direction: column; justify-content: space-between;
+                                border: 1px solid #ddd; border-radius: 8px; overflow: hidden; transition: transform 0.3s;">
+                                <!-- Image -->
+                                <div style="height: 250px; overflow: hidden; position: relative;">
+                                    <img th:src="${campaign.img}" class="card-img-top w-100" alt="Chiến dịch"
+                                        style="width: 100%; height: 100%; object-fit: cover; filter: grayscale(30%);">
+                                    <!-- Status Badge - Different colors based on status -->
+                                    <span th:if="${campaign.goalReached}" class="badge bg-success"
+                                        style="position: absolute; top: 10px; right: 10px; font-size: 0.9em;">
+                                        <i class="fas fa-check-circle me-1"></i>Đã đủ quỹ
+                                    </span>
+                                    <span th:unless="${campaign.goalReached}" class="badge bg-secondary"
+                                        style="position: absolute; top: 10px; right: 10px; font-size: 0.9em;">
+                                        <i class="fas fa-clock me-1"></i>Đã kết thúc
+                                    </span>
+                                    <!-- Heart Icon Overlay - Bottom Right -->
+                                    <a th:href="@{'/follow-project?id=' + ${campaign.id}}" class="btn btn-link p-0"
+                                        style="position: absolute; bottom: 10px; right: 10px; z-index: 10; text-decoration: none;">
+                                        <i th:class="${followedProjectIds != null and followedProjectIds.contains(campaign.id)} ? 'fas fa-heart text-danger fa-2x' : 'far fa-heart text-white fa-2x'"
+                                            style="text-shadow: 0 2px 5px rgba(0,0,0,0.5);"></i>
+                                    </a>
+                                </div>
+                                <!-- Content -->
+                                <div class="card-body d-flex flex-column" style="padding: 15px;">
+                                    <h5 class="card-title" th:text="${campaign.title}"
+                                        style="font-size: 1.1em; font-weight: bold; color: #333; text-align: center; margin: 10px 0;">
+                                    </h5>
+
+                                    <!-- Status Display -->
+                                    <p th:if="${campaign.goalReached}" class="card-text"
+                                        style="font-size: 1em; font-weight: bold; text-align: center; color: #28a745;
+                                        background-color: #d4edda; border: 2px solid #28a745; padding: 10px 20px;
+                                        border-radius: 5px; display: inline-block; width: fit-content; margin: 0 auto 15px auto;">
+                                        <i class="fas fa-check-circle me-1"></i>Đã đạt mục tiêu
+                                    </p>
+                                    <p th:unless="${campaign.goalReached}" class="card-text"
+                                        style="font-size: 1em; font-weight: bold; text-align: center; color: #6c757d;
+                                        background-color: #e9ecef; border: 2px solid #6c757d; padding: 10px 20px;
+                                        border-radius: 5px; display: inline-block; width: fit-content; margin: 0 auto 15px auto;">
+                                        <i class="fas fa-hourglass-end me-1"></i>Đã hết thời gian
+                                    </p>
+
+                                    <p class="card-text"
+                                        th:text="'Tổng quyên góp: ' + ${#numbers.formatDecimal(campaign.amountRaised, 0, 'COMMA', 0, 'POINT')} + ' đ'"
+                                        style="font-size: 0.9em; font-weight: bold; text-align: center; color: #28a745; margin-bottom: 5px;">
+                                    </p>
+                                    <p class="card-text"
+                                        th:text="'Mục tiêu: ' + ${#numbers.formatDecimal(campaign.goalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"
+                                        style="font-size: 0.9em; font-weight: bold; text-align: center; color: #666; margin-bottom: 5px;">
+                                    </p>
+
+
+                                    <div class="progress" style="height: 10px; margin-bottom: 20px;">
+                                        <div class="progress-bar bg-secondary" role="progressbar"
+                                            th:style="'width: ' + ${(campaign.amountRaised * 100.0) / campaign.goalAmount} + '%'"
+                                            aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+
+                                    <a th:href="@{'/du-an/' + ${campaign.id}}" class="btn btn-secondary"
+                                        style="background-color: #666; color: white; margin-top: auto; border-radius: 5px; border: none;">
+                                        Xem kết quả
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const countdownElements = document.querySelectorAll('.countdown');
+
+            countdownElements.forEach(function (element) {
+                const endDateStr = element.dataset.enddate;
+
+                // Manually parse the date from 'dd/MM/yyyy' to 'yyyy-MM-dd'
+                const [day, month, year] = endDateStr.split('/');
+                const endDate = new Date(`${year}-${month}-${day}`); // Reformat to 'yyyy-MM-dd'
+
+                if (isNaN(endDate)) {
+                    console.error("Invalid date format for countdown:", endDateStr);
+                    element.textContent = "Lỗi định dạng ngày";
+                    return;
+                }
+
+                function updateCountdown() {
+                    const now = new Date();
+                    const timeDifference = endDate - now;
+
+                    if (timeDifference <= 0) {
+                        // Set the text to "Đã hết hạn" if the campaign is expired
+                        element.textContent = "Đã hết hạn";
+                        return;
+                    }
+
+                    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+                    element.textContent = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+                }
+
+                // Update immediately, and then update every second
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            });
+        });
+
+
+    </script>
+
+    <script>
+        // Hiệu ứng mở menu thả xuống khi hover
+        document.querySelectorAll('.nav-item.dropdown').forEach(function (dropdown) {
+            dropdown.addEventListener('mouseenter', function () {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.style.display = 'block';
+                menu.style.opacity = '1';
+            });
+
+            dropdown.addEventListener('mouseleave', function () {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.style.opacity = '0';
+                setTimeout(() => (menu.style.display = 'none'), 300);
+            });
+        });
+
+        // Thêm hiệu ứng hover cho các liên kết
+        document.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('mouseenter', function () {
+                this.style.backgroundColor = '#007bff'; // Màu nền hover
+                this.style.color = '#fff'; // Màu chữ khi hover
+            });
+            link.addEventListener('mouseleave', function () {
+                this.style.backgroundColor = ''; // Xóa màu nền hover
+                this.style.color = '#000'; // Màu chữ ban đầu
+            });
+        });
+    </script>
+
+    <!-- Include Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - Quỹ Từ Thiện UTE</title>
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        .register-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="register-container">
+        <div class="text-center mb-4">
+            <h3 class="text-primary"><i class="fas fa-user-plus me-2"></i>Đăng Ký Tài Khoản</h3>
+            <p class="text-muted">Tham gia cùng cộng đồng UTE Charity</p>
+        </div>
+
+        <!-- Alert error -->
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+        <form action="/dang-ky" method="post">
+            <!-- Fullname input -->
+            <div class="mb-4">
+                <label class="form-label" for="fullname" style="font-weight: 500;">Họ và tên</label>
+                <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Nhập họ và tên"
+                    required />
+            </div>
+
+            <!-- Username input -->
+            <div class="mb-4">
+                <label class="form-label" for="username" style="font-weight: 500;">Tên đăng nhập</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tên đăng nhập"
+                    required />
+            </div>
+
+            <!-- Email input -->
+            <div class="mb-4">
+                <label class="form-label" for="email" style="font-weight: 500;">Email</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Nhập email" required />
+            </div>
+
+            <!-- Password input -->
+            <div class="mb-4">
+                <label class="form-label" for="password" style="font-weight: 500;">Mật khẩu</label>
+                <input type="password" id="password" name="password" class="form-control"
+                    placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required minlength="6" />
+            </div>
+
+            <!-- Confirm Password input -->
+            <div class="mb-4">
+                <label class="form-label" for="confirm_password" style="font-weight: 500;">Nhập lại mật khẩu</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                    placeholder="Xác nhận mật khẩu" required minlength="6" />
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary btn-block mb-4" style="padding: 10px; font-size: 1.1em;">Đăng
+                ký</button>
+
+            <!-- Login link -->
+            <div class="text-center">
+                <p>Đã có tài khoản? <a href="/dang-nhap" style="font-weight: bold;">Đăng nhập ngay</a></p>
+            </div>
+        </form>
+    </div>
+
+    <!-- MDB -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+</body>
+
+</html>

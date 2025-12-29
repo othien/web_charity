@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quyên góp - Quỹ từ thiện UTE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #dc3545 0%, #8b2323 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .payment-header h2 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .payment-header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+        }
+
+        .payment-body {
+            padding: 30px;
+        }
+
+        .project-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .project-info h5 {
+            margin: 0 0 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .project-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .amount-btn {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .amount-btn:hover,
+        .amount-btn.active {
+            border-color: #dc3545;
+            background: #fff5f5;
+            color: #dc3545;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .form-control:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .btn-donate {
+            background: linear-gradient(135deg, #dc3545 0%, #8b2323 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            width: 100%;
+            color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-donate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
+            color: white;
+        }
+
+        .vnpay-logo {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .vnpay-logo img {
+            height: 40px;
+            opacity: 0.7;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back-link a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-card">
+        <div class="payment-header">
+            <i class="fas fa-hand-holding-heart fa-3x mb-3"></i>
+            <h2>Quyên Góp Từ Thiện</h2>
+            <p>Mỗi đóng góp của bạn đều mang lại hy vọng</p>
+        </div>
+
+        <div class="payment-body">
+            <!-- Project Info (if available) -->
+            <div th:if="${project != null}" class="project-info">
+                <h5><i class="fas fa-heart-pulse me-2"></i><span th:text="${project.title}">Tên dự án</span></h5>
+                <p>Mã dự án: <strong th:text="${project.code}">CODE</strong></p>
+            </div>
+
+            <form th:action="@{/submitOrder}" method="post">
+                <!-- Quick Amount Buttons -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Chọn số tiền quyên góp:</label>
+                    <div class="amount-grid">
+                        <button type="button" class="amount-btn" onclick="setAmount(50000)">50.000đ</button>
+                        <button type="button" class="amount-btn" onclick="setAmount(100000)">100.000đ</button>
+                        <button type="button" class="amount-btn" onclick="setAmount(200000)">200.000đ</button>
+                        <button type="button" class="amount-btn" onclick="setAmount(500000)">500.000đ</button>
+                        <button type="button" class="amount-btn" onclick="setAmount(1000000)">1.000.000đ</button>
+                        <button type="button" class="amount-btn" onclick="setAmount(2000000)">2.000.000đ</button>
+                    </div>
+                </div>
+
+                <!-- Custom Amount -->
+                <div class="mb-3">
+                    <label for="amount" class="form-label fw-bold">Hoặc nhập số tiền khác (VNĐ):</label>
+                    <input type="number" class="form-control" id="amount" name="amount" min="10000"
+                        placeholder="Tối thiểu 10.000đ" required>
+                </div>
+
+                <!-- Order Info -->
+                <div class="mb-4">
+                    <label for="orderInfo" class="form-label fw-bold">Nội dung quyên góp:</label>
+                    <input type="text" class="form-control" id="orderInfo" name="orderInfo"
+                        th:value="${project != null ? 'Ung ho du an ' + project.code : ''}"
+                        placeholder="VD: Ung ho du an QC001" required>
+                    <div class="form-text" th:if="${project != null}">
+                        <i class="fas fa-info-circle"></i> Nội dung đã được tự động điền mã dự án
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-donate">
+                    <i class="fas fa-credit-card me-2"></i>Thanh toán qua VNPay
+                </button>
+            </form>
+
+            <!-- VNPay Logo -->
+            <div class="vnpay-logo">
+                <img th:src="@{/vnpay-logo.png}" alt="VNPay" onerror="this.style.display='none'">
+                <p class="text-muted small mt-2">Thanh toán an toàn qua cổng VNPay</p>
+            </div>
+
+            <!-- Back Link -->
+            <div class="back-link">
+                <a href="javascript:history.back()">
+                    <i class="fas fa-arrow-left me-1"></i>Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setAmount(amount) {
+            document.getElementById('amount').value = amount;
+            // Update active state
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Format number with commas when typing
+        document.getElementById('amount').addEventListener('input', function (e) {
+            // Remove non-numeric characters except for the value
+            let value = e.target.value.replace(/\D/g, '');
+            e.target.value = value;
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+</body>
+
+</html>

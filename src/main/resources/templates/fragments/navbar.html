@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-body-tertiary"
+        style="box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 10px; background-color: #ffefdb !important; position: fixed; top: 0; width: 100%; z-index: 1000;">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Toggle button -->
+            <button data-mdb-collapse-init class="navbar-toggler" type="button" data-mdb-target="#navbarCenteredExample"
+                aria-controls="navbarCenteredExample" aria-expanded="false" aria-label="Toggle navigation"
+                style="border: none; outline: none; font-size: 24px;">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Collapsible wrapper -->
+            <div class="collapse navbar-collapse" id="navbarCenteredExample"
+                style="transition: opacity 0.5s ease, visibility 0.5s; opacity: 1;">
+                <!-- Left links (Main Menu) - Aligned to the right with ms-auto -->
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0" style="align-items: center;">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/trang-chu" style="padding: 10px 15px; color: #000; font-weight: 500;
+                              border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                            Trang chủ
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/gioi-thieu" style="padding: 10px 15px; color: #000; font-weight: 500;
+                              border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                            Giới thiệu
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown" style="position: relative;">
+                        <a class="nav-link active dropdown-toggle" href="/du-an" id="navbarDropdown_projects"
+                            role="button" aria-expanded="false"
+                            style="padding: 10px 15px; color: #000; font-weight: 500; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                            Dự án
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown_projects"
+                            style="position: absolute; top: 100%; left: 0; display: none; background-color: #f1f1f1; border-radius: 5px; min-width: 200px; transition: opacity 0.3s;">
+                            <li><a class="dropdown-item" href="/du-an?category=Y tế"
+                                    style="padding: 10px 15px; color: #000;">Y tế</a></li>
+                            <li><a class="dropdown-item" href="/du-an?category=Trẻ em"
+                                    style="padding: 10px 15px; color: #000;">Trẻ em</a></li>
+                            <li><a class="dropdown-item" href="/du-an?category=Giáo dục"
+                                    style="padding: 10px 15px; color: #000;">Giáo dục</a></li>
+                            <li><a class="dropdown-item" href="/du-an?category=Thiên tai"
+                                    style="padding: 10px 15px; color: #000;">Thiên tai</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/huong-dan-dong-gop" style="padding: 10px 15px; color: #000; font-weight: 500;
+                              border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                            Đóng góp
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/tin-tuc-cong-dong" style="padding: 10px 15px; color: #000; font-weight: 500;
+                              border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                            Tin tức cộng đồng
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/lien-he" style="padding: 10px 15px; color: #000; font-weight: 500;
+                              border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                            Liên hệ
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Language Switcher -->
+                <ul class="navbar-nav mb-2 mb-lg-0 me-3">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLanguage" role="button"
+                            aria-expanded="false" style="font-weight: 500; display: flex; align-items: center;">
+                            <i class="fas fa-globe me-2"></i> Ngôn ngữ
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownLanguage">
+                            <li><a class="dropdown-item" href="?lang=vi"><span class="fi fi-vn me-2"></span>Tiếng
+                                    Việt</a></li>
+                            <li><a class="dropdown-item" href="?lang=en"><span class="fi fi-us me-2"></span>English</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <!-- Right links: Login/Register or Profile/Logout -->
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <!-- If user is NOT logged in -->
+                    <li class="nav-item" th:if="${session.user == null}">
+                        <a class="nav-link" href="/dang-nhap" style="font-weight: 500; padding: 10px 15px;">Đăng
+                            nhập</a>
+                    </li>
+                    <li class="nav-item" th:if="${session.user == null}">
+                        <a class="btn btn-primary" href="/dang-ky" style="margin-left: 10px; border-radius: 20px;">Đăng
+                            ký</a>
+                    </li>
+
+                    <!-- If user IS logged in -->
+                    <li class="nav-item dropdown" th:if="${session.user != null}">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" role="button"
+                            aria-expanded="false" style="font-weight: 500; display: flex; align-items: center;">
+                            <span th:text="${session.user.fullname}">User</span>
+                            <i class="fas fa-user-circle fa-lg ms-2"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
+                            <li><a class="dropdown-item" href="/ho-so">Hồ sơ cá nhân</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/dang-xuat">Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <script>
+            // Hiệu ứng mở menu thả xuống khi hover
+            document.querySelectorAll('.nav-item.dropdown').forEach(function (dropdown) {
+                dropdown.addEventListener('mouseenter', function () {
+                    const menu = this.querySelector('.dropdown-menu');
+                    if (menu) {
+                        menu.style.display = 'block';
+                        menu.style.opacity = '1';
+                    }
+                });
+
+                dropdown.addEventListener('mouseleave', function () {
+                    const menu = this.querySelector('.dropdown-menu');
+                    if (menu) {
+                        menu.style.opacity = '0';
+                        setTimeout(() => (menu.style.display = 'none'), 300);
+                    }
+                });
+            });
+        </script>
+    </nav>
+</body>
+
+</html>

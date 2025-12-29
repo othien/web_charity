@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý liên hệ - Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        @media (min-width: 991.98px) {
+            main {
+                padding-left: 260px;
+            }
+        }
+
+        .stat-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .badge-status {
+            padding: 0.4em 0.8em;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div th:replace="page_admin/layout/sidebar :: sidebar"></div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="navbar-brand mb-0 h5">Quản lý liên hệ</span>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-user me-1"></i> <span
+                                th:text="${user}">Admin</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main style="margin-top: 58px;">
+        <div class="container-fluid pt-4 px-4">
+
+            <!-- Tabs -->
+            <ul class="nav nav-pills mb-4">
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${selectedType == 'Liên hệ chung'} ? 'active'"
+                        href="/admin/contacts?type=Liên hệ chung">
+                        <i class="fas fa-envelope me-1"></i> Liên hệ chung
+                    </a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a class="nav-link" th:classappend="${selectedType == 'Yêu cầu hỗ trợ'} ? 'active'"
+                        href="/admin/contacts?type=Yêu cầu hỗ trợ">
+                        <i class="fas fa-hands-helping me-1"></i> Yêu cầu hỗ trợ
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Professional Filter Section -->
+            <div class="card stat-card mb-4">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="fas fa-filter text-primary me-2"></i>Bộ lọc tìm kiếm</h6>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="filterForm" class="row g-3" method="get" action="/admin/contacts">
+                        <input type="hidden" name="type" th:value="${selectedType}">
+
+                        <!-- Search Box -->
+                        <div class="col-md-4">
+                            <label class="form-label"><i class="fas fa-search me-1"></i>Tìm kiếm</label>
+                            <input type="text" class="form-control" name="searchTerm" id="searchTerm"
+                                placeholder="Tên, email, SĐT, nội dung..." th:value="${searchTerm}">
+                        </div>
+
+                        <!-- Status Filter (for Support Requests) -->
+                        <div class="col-md-2" th:if="${selectedType == 'Yêu cầu hỗ trợ'}">
+                            <label class="form-label"><i class="fas fa-flag me-1"></i>Trạng thái</label>
+                            <select class="form-select" name="status" id="statusFilter">
+                                <option value="">Tất cả</option>
+                                <option value="0" th:selected="${status == 0}">Chờ duyệt</option>
+                                <option value="1" th:selected="${status == 1}">Đã phê duyệt</option>
+                                <option value="2" th:selected="${status == 2}">Hoàn tất</option>
+                            </select>
+                        </div>
+
+                        <!-- Relationship Filter (for Support Requests) -->
+                        <div class="col-md-2" th:if="${selectedType == 'Yêu cầu hỗ trợ'}">
+                            <label class="form-label"><i class="fas fa-users me-1"></i>Quan hệ</label>
+                            <select class="form-select" name="relationship" id="relationshipFilter">
+                                <option value="">Tất cả</option>
+                                <option value="Bản thân" th:selected="${relationship == 'Bản thân'}">Bản thân</option>
+                                <option value="Người thân" th:selected="${relationship == 'Người thân'}">Người thân
+                                </option>
+                                <option value="Bạn bè" th:selected="${relationship == 'Bạn bè'}">Bạn bè</option>
+                                <option value="Hàng xóm" th:selected="${relationship == 'Hàng xóm'}">Hàng xóm</option>
+                                <option value="Khác" th:selected="${relationship == 'Khác'}">Khác</option>
+                            </select>
+                        </div>
+
+                        <!-- Date Range Filter -->
+                        <div class="col-md-2">
+                            <label class="form-label"><i class="fas fa-calendar me-1"></i>Từ ngày</label>
+                            <input type="date" class="form-control" name="fromDate" id="fromDate"
+                                th:value="${fromDate}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label"><i class="fas fa-calendar-alt me-1"></i>Đến ngày</label>
+                            <input type="date" class="form-control" name="toDate" id="toDate" th:value="${toDate}">
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="col-md-12 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Tìm kiếm
+                            </button>
+                            <button type="button" class="btn btn-outline-info" onclick="exportContacts()">
+                                <i class="fas fa-file-excel me-1"></i>Xuất Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Active Filters Display -->
+                <div class="card-footer bg-light py-2"
+                    th:if="${searchTerm != null || status != null || relationship != null || fromDate != null || toDate != null}">
+                    <small class="text-muted me-2">Đang lọc:</small>
+                    <span th:if="${searchTerm != null && !searchTerm.isEmpty()}" class="badge bg-primary me-1">
+                        Từ khóa: <span th:text="${searchTerm}"></span>
+                        <a href="#" onclick="removeFilter('searchTerm')" class="text-white ms-1"><i
+                                class="fas fa-times-circle"></i></a>
+                    </span>
+                    <span th:if="${status != null}" class="badge bg-warning text-dark me-1">
+                        Trạng thái: <span
+                            th:text="${status == 0 ? 'Chờ duyệt' : (status == 1 ? 'Đã phê duyệt' : 'Hoàn tất')}"></span>
+                        <a href="#" onclick="removeFilter('status')" class="text-dark ms-1"><i
+                                class="fas fa-times-circle"></i></a>
+                    </span>
+                    <span th:if="${relationship != null && !relationship.isEmpty()}" class="badge bg-info me-1">
+                        Quan hệ: <span th:text="${relationship}"></span>
+                        <a href="#" onclick="removeFilter('relationship')" class="text-white ms-1"><i
+                                class="fas fa-times-circle"></i></a>
+                    </span>
+                    <span th:if="${fromDate != null}" class="badge bg-secondary me-1">
+                        Từ: <span th:text="${fromDate}"></span>
+                        <a href="#" onclick="removeFilter('fromDate')" class="text-white ms-1"><i
+                                class="fas fa-times-circle"></i></a>
+                    </span>
+                    <span th:if="${toDate != null}" class="badge bg-secondary me-1">
+                        Đến: <span th:text="${toDate}"></span>
+                        <a href="#" onclick="removeFilter('toDate')" class="text-white ms-1"><i
+                                class="fas fa-times-circle"></i></a>
+                    </span>
+                </div>
+            </div>
+
+            <!-- General Contact View -->
+            <div class="card stat-card" th:if="${selectedType == 'Liên hệ chung'}">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Họ tên</th>
+                                    <th>Email</th>
+                                    <th>SĐT</th>
+                                    <th>Nội dung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${contacts}">
+                                    <td th:text="${c.id}">1</td>
+                                    <td th:text="${c.user_fullname}">Nguyễn Văn A</td>
+                                    <td th:text="${c.user_email}">email@example.com</td>
+                                    <td th:text="${c.user_phone}">0123456789</td>
+                                    <td th:text="${#strings.abbreviate(c.user_comment, 60)}">Nội dung...</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(contacts)}">
+                                    <td colspan="5" class="text-center text-muted py-4">Không có liên hệ nào</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Request View -->
+            <div class="card stat-card" th:if="${selectedType == 'Yêu cầu hỗ trợ'}">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Người cần hỗ trợ</th>
+                                    <th>SĐT</th>
+                                    <th>Người báo tin</th>
+                                    <th>Quan hệ</th>
+                                    <th>Nội dung</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${contacts}">
+                                    <td th:text="${c.id}">1</td>
+                                    <td><strong th:text="${c.beneficiaryName}">Người cần giúp</strong></td>
+                                    <td th:text="${c.beneficiaryPhone}">0123456789</td>
+                                    <td th:text="${c.reporterName != null} ? ${c.reporterName} : ${c.user_fullname}">
+                                        Người báo</td>
+                                    <td th:text="${c.relationship}">Người thân</td>
+                                    <td>
+                                        <span th:text="${#strings.abbreviate(c.user_comment, 40)}">Mô tả hoàn
+                                            cảnh...</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-status" th:classappend="${c.status == null || c.status == 0} ? 'bg-warning text-dark' :
+                                                          (${c.status == 1} ? 'bg-success' : 'bg-info')" th:text="${c.status == null || c.status == 0} ? 'Chờ duyệt' :
+                                                    (${c.status == 1} ? 'Đã phê duyệt' : 'Hoàn tất')">Chờ duyệt</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <!-- View Details button -->
+                                            <button type="button" class="btn btn-outline-info btn-sm"
+                                                title="Xem chi tiết" onclick="showDetails(this)" th:data-id="${c.id}"
+                                                th:data-beneficiary="${c.beneficiaryName}"
+                                                th:data-beneficiaryphone="${c.beneficiaryPhone}"
+                                                th:data-reporter="${c.reporterName}"
+                                                th:data-reporterphone="${c.reporterPhone}"
+                                                th:data-email="${c.user_email}" th:data-relationship="${c.relationship}"
+                                                th:data-comment="${c.user_comment}"
+                                                th:data-image="${c.verificationImage}" th:data-status="${c.status}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+
+                                            <!-- Approve button (only show if pending) -->
+                                            <button th:if="${c.status == null || c.status == 0}" type="button"
+                                                class="btn btn-success btn-sm" title="Phê duyệt"
+                                                th:onclick="'confirmApprove(' + ${c.id} + ')'">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+
+                                            <!-- Create Project button (only show if approved) -->
+                                            <a th:if="${c.status == 1}"
+                                                th:href="@{/admin/contacts/create-project/{id}(id=${c.id})}"
+                                                class="btn btn-primary btn-sm" title="Tạo dự án vận động">
+                                                <i class="fas fa-plus-circle"></i> Vận động
+                                            </a>
+
+                                            <!-- Delete button for all -->
+                                            <button type="button" class="btn btn-outline-danger btn-sm" title="Xóa"
+                                                th:onclick="'confirmDelete(' + ${c.id} + ')'">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(contacts)}">
+                                    <td colspan="8" class="text-center text-muted py-4">Không có yêu cầu hỗ trợ nào</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-3" th:if="${totalPages > 1}">
+                <span class="text-muted">Trang <span th:text="${currentPage + 1}">1</span> / <span
+                        th:text="${totalPages}">1</span>
+                    (<span th:text="${totalElements}">0</span> kết quả)
+                </span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/admin/contacts(page=${currentPage - 1}, type=${selectedType}, searchTerm=${searchTerm}, status=${status}, relationship=${relationship}, fromDate=${fromDate}, toDate=${toDate})}">Trước</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${i == currentPage} ? 'active'"
+                            th:if="${totalPages <= 10 || (i == 0) || (i == totalPages - 1) || (i >= currentPage - 2 && i <= currentPage + 2)}">
+                            <a class="page-link"
+                                th:href="@{/admin/contacts(page=${i}, type=${selectedType}, searchTerm=${searchTerm}, status=${status}, relationship=${relationship}, fromDate=${fromDate}, toDate=${toDate})}"
+                                th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/admin/contacts(page=${currentPage + 1}, type=${selectedType}, searchTerm=${searchTerm}, status=${status}, relationship=${relationship}, fromDate=${fromDate}, toDate=${toDate})}">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="detailModalLabel">
+                        <i class="fas fa-info-circle me-2"></i>Chi tiết yêu cầu hỗ trợ #<span id="detailId"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeModal()"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary"><i class="fas fa-user-injured me-2"></i>Người cần hỗ trợ</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="40%">Họ tên:</th>
+                                    <td id="detailBeneficiary"></td>
+                                </tr>
+                                <tr>
+                                    <th>Số điện thoại:</th>
+                                    <td id="detailBeneficiaryPhone"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-success"><i class="fas fa-user me-2"></i>Người báo tin</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="40%">Họ tên:</th>
+                                    <td id="detailReporter"></td>
+                                </tr>
+                                <tr>
+                                    <th>Số điện thoại:</th>
+                                    <td id="detailReporterPhone"></td>
+                                </tr>
+                                <tr>
+                                    <th>Email:</th>
+                                    <td id="detailEmail"></td>
+                                </tr>
+                                <tr>
+                                    <th>Quan hệ:</th>
+                                    <td id="detailRelationship"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="text-warning"><i class="fas fa-file-alt me-2"></i>Mô tả hoàn cảnh</h6>
+                    <div class="alert alert-light border" id="detailComment"
+                        style="white-space: pre-wrap; max-height: 200px; overflow-y: auto;"></div>
+
+                    <div id="imageSection" style="display: none;">
+                        <h6 class="text-info"><i class="fas fa-image me-2"></i>Hình ảnh xác thực</h6>
+                        <a id="detailImageLink" href="#" target="_blank">
+                            <img id="detailImage" src="" class="img-fluid rounded" style="max-height: 300px;"
+                                alt="Hình ảnh xác thực">
+                        </a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <span id="detailStatusBadge" class="badge me-auto"></span>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function showDetails(btn) {
+            document.getElementById('detailId').textContent = btn.dataset.id;
+            document.getElementById('detailBeneficiary').textContent = btn.dataset.beneficiary || '-';
+            document.getElementById('detailBeneficiaryPhone').textContent = btn.dataset.beneficiaryphone || '-';
+            document.getElementById('detailReporter').textContent = btn.dataset.reporter || '-';
+            document.getElementById('detailReporterPhone').textContent = btn.dataset.reporterphone || '-';
+            document.getElementById('detailEmail').textContent = btn.dataset.email || '-';
+            document.getElementById('detailRelationship').textContent = btn.dataset.relationship || '-';
+            document.getElementById('detailComment').textContent = btn.dataset.comment || '-';
+
+            // Handle image
+            const imageSection = document.getElementById('imageSection');
+            const detailImage = document.getElementById('detailImage');
+            const detailImageLink = document.getElementById('detailImageLink');
+            if (btn.dataset.image && btn.dataset.image !== 'null' && btn.dataset.image.trim() !== '') {
+                imageSection.style.display = 'block';
+                detailImage.src = btn.dataset.image;
+                detailImageLink.href = btn.dataset.image;
+            } else {
+                imageSection.style.display = 'none';
+            }
+
+            // Handle status badge
+            const statusBadge = document.getElementById('detailStatusBadge');
+            const status = parseInt(btn.dataset.status) || 0;
+            if (status === 0) {
+                statusBadge.className = 'badge bg-warning text-dark me-auto';
+                statusBadge.textContent = 'Chờ duyệt';
+            } else if (status === 1) {
+                statusBadge.className = 'badge bg-success me-auto';
+                statusBadge.textContent = 'Đã phê duyệt';
+            } else {
+                statusBadge.className = 'badge bg-info me-auto';
+                statusBadge.textContent = 'Hoàn tất';
+            }
+
+            // Show modal - try MDB first, then fallback to Bootstrap
+            try {
+                const modalElement = document.getElementById('detailModal');
+                let modalInstance = mdb.Modal.getInstance(modalElement);
+                if (!modalInstance) {
+                    modalInstance = new mdb.Modal(modalElement);
+                }
+                modalInstance.show();
+            } catch (e) {
+                console.log('MDB modal error, trying alternative:', e);
+                document.getElementById('detailModal').classList.add('show');
+                document.getElementById('detailModal').style.display = 'block';
+                document.body.classList.add('modal-open');
+            }
+        }
+
+        function closeModal() {
+            const modalElement = document.getElementById('detailModal');
+            modalElement.classList.remove('show');
+            modalElement.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            // Remove any backdrop
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(b => b.remove());
+        }
+
+        function confirmApprove(id) {
+            Swal.fire({
+                title: 'Xác nhận phê duyệt?',
+                text: 'Bạn có chắc chắn muốn phê duyệt yêu cầu hỗ trợ này?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-check"></i> Phê duyệt',
+                cancelButtonText: '<i class="fas fa-times"></i> Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Đang xử lý...',
+                        text: 'Vui lòng đợi',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Submit form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/admin/contacts/approve/' + id;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: 'Bạn có chắc chắn muốn xóa yêu cầu hỗ trợ này? Hành động này không thể hoàn tác!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash"></i> Xóa',
+                cancelButtonText: '<i class="fas fa-times"></i> Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/admin/contacts/delete/' + id;
+                }
+            });
+        }
+
+        // Check for success message in URL
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('approveSuccess') === 'true') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Phê duyệt thành công!',
+                    text: 'Yêu cầu hỗ trợ đã được phê duyệt. Bạn có thể tạo dự án vận động.',
+                    confirmButtonColor: '#28a745',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                window.history.replaceState({}, document.title, window.location.pathname + '?type=Yêu cầu hỗ trợ');
+            }
+            if (urlParams.get('deleteSuccess') === 'true') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Xóa thành công!',
+                    text: 'Yêu cầu hỗ trợ đã được xóa.',
+                    confirmButtonColor: '#28a745',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                window.history.replaceState({}, document.title, window.location.pathname + '?type=Yêu cầu hỗ trợ');
+            }
+        });
+
+        // ===== Filter Functions =====
+        function clearFilters() {
+            const type = document.querySelector('input[name="type"]').value;
+            window.location.href = '/admin/contacts?type=' + encodeURIComponent(type);
+        }
+
+        function removeFilter(filterName) {
+            event.preventDefault();
+            const url = new URL(window.location.href);
+            url.searchParams.delete(filterName);
+            window.location.href = url.toString();
+        }
+
+        function exportContacts() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Xuất Excel',
+                text: 'Tính năng xuất Excel đang được phát triển.',
+                confirmButtonColor: '#1976d2',
+                timer: 2000,
+                timerProgressBar: true
+            });
+        }
+    </script>
+</body>
+
+</html>

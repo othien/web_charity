@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm tài khoản</title>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Roboto', sans-serif;
+        }
+        .form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2 class="text-center">Thêm tài khoản</h2>
+    <form method="post" th:action="@{/insert/authorization}">
+
+        <!-- Hiển thị lỗi -->
+        <div th:if="${error != null}" class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i> <span th:text="${error}"></span>
+        </div>
+
+        <!-- Username -->
+        <div class="form-group mb-3">
+            <label for="inputusername" class="form-label">
+                <i class="fas fa-user"></i> Tên tài khoản
+            </label>
+            <input type="text" name="inputusername" class="form-control" id="inputusername" placeholder="Nhập tên tài khoản" required>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group mb-3">
+            <label for="inputpassword" class="form-label">
+                <i class="fas fa-lock"></i> Mật khẩu
+            </label>
+            <input type="password" name="inputpassword" class="form-control" id="inputpassword" placeholder="Nhập mật khẩu" required>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group mb-3">
+            <label for="confirmpassword" class="form-label">
+                <i class="fas fa-lock"></i> Nhập lại mật khẩu
+            </label>
+            <input type="password" name="confirmpassword" class="form-control" id="confirmpassword" placeholder="Nhập lại mật khẩu" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="email" class="form-label">
+                <i class="fas fa-lock"></i> Email
+            </label>
+            <input type="email" name="email" class="form-control" id="email" placeholder="Nhập email" required>
+        </div>
+
+        <!-- Roles -->
+        <div class="form-group mb-4">
+            <label for="inputroles" class="form-label">
+                <i class="fas fa-users"></i> Vai trò
+            </label>
+            <select name="inputroles" class="form-select" id="inputroles" required>
+                <option value="" disabled selected>-- Chọn vai trò --</option>
+                <option value="admin">Quản trị viên</option>
+                <option value="staff">Nhân viên</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm tài khoản
+        </button>
+    </form>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

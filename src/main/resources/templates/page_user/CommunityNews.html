@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <!-- Intro settings -->
+    <title>Tin Tức Cộng Đồng</title>
+    <style>
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: #ffefdb !important;
+        }
+
+        header {
+            padding-top: 120px;
+            /* Bù lại chiều cao của navbar */
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            /* Đảm bảo không có khoảng cách giữa menu và dropdown */
+        }
+
+        /* Dropdown Style */
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        .nav-link.dropdown-toggle {
+            padding: 10px 15px;
+            color: #000;
+            font-weight: 500;
+            border-radius: 50px;
+            /* Tạo hình tròn cho nút dropdown */
+            transition: all 0.3s ease;
+            /* Hiệu ứng chuyển màu mượt mà */
+        }
+
+        /* Hover effect */
+        .nav-link.dropdown-toggle:hover {
+            background-color: #ff6f61;
+            /* Màu nền khi hover */
+            color: white;
+            /* Màu chữ khi hover */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            /* Hiệu ứng bóng đổ */
+        }
+
+        /* Dropdown menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Show dropdown menu on hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Dropdown item */
+        .dropdown-item {
+            padding: 12px 20px;
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect on dropdown items */
+        .dropdown-item:hover {
+            background-color: #ff6f61;
+            color: white;
+            transform: translateX(5px);
+            /* Hiệu ứng chuyển động */
+        }
+
+        /* For small screens */
+        @media (max-width: 768px) {
+            .nav-link.dropdown-toggle {
+                padding: 10px;
+            }
+
+            .dropdown-item {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Thanh điều hướng -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <!-- Header Section -->
+    <header class="text-center my-5" style="margin-top: 100px">
+        <div class="container">
+            <h1 class="font-weight-bold">Tin Tức và Cập Nhật Cộng Đồng</h1>
+            <p class="lead">Hãy theo dõi các tin tức và sự kiện mới nhất trong cộng đồng của chúng ta.</p>
+        </div>
+    </header>
+
+    <!-- News Section -->
+    <section class="container my-5">
+        <div class="row">
+            <div class="col-md-4 mb-4" th:each="communityNewsModel : ${communityNewsModels}">
+                <div class="card h-100 shadow"
+                    style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="height: 200px; overflow: hidden;">
+                        <img th:src="${communityNewsModel.img_news}" class="card-img-top" alt="Tin Tức"
+                            style="width: 100%; height: 100%; object-fit: cover;" src="">
+                    </div>
+                    <div class="card-body" style="display: flex; flex-direction: column; flex: 1;">
+                        <h5 class="card-title" th:text="${communityNewsModel.title_news}"
+                            style="font-size: 1.2em; font-weight: bold;"></h5>
+                        <p class="card-text" th:text="${communityNewsModel.date_update}"
+                            style="font-size: 0.9em; color: #888;"></p>
+                        <p class="card-text" th:text="${communityNewsModel.sub_titlenews}"
+                            style="font-size: 1em; flex: 1;"></p>
+                        <a th:href="${communityNewsModel.url_artical}" class="btn btn-primary"
+                            style="background-color: #8b2323; border-color: #8b2323; color: white;">Đọc Thêm</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
+    <script>
+        // Hiệu ứng mở menu thả xuống khi hover
+        document.querySelectorAll('.nav-item.dropdown').forEach(function (dropdown) {
+            dropdown.addEventListener('mouseenter', function () {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.style.display = 'block';
+                menu.style.opacity = '1';
+            });
+
+            dropdown.addEventListener('mouseleave', function () {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.style.opacity = '0';
+                setTimeout(() => (menu.style.display = 'none'), 300);
+            });
+        });
+
+        // Thêm hiệu ứng hover cho các liên kết
+        document.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('mouseenter', function () {
+                this.style.backgroundColor = '#007bff'; // Màu nền hover
+                this.style.color = '#fff'; // Màu chữ khi hover
+            });
+            link.addEventListener('mouseleave', function () {
+                this.style.backgroundColor = ''; // Xóa màu nền hover
+                this.style.color = '#000'; // Màu chữ ban đầu
+            });
+        });
+    </script>
+
+    <!-- Include Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+
+</html>

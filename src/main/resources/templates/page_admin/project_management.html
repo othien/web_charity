@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý dự án - Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        @media (min-width: 991.98px) {
+            main {
+                padding-left: 260px;
+            }
+        }
+
+        .stat-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .badge-status {
+            padding: 0.4em 0.8em;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.85em;
+        }
+
+        .project-thumb {
+            width: 60px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div th:replace="page_admin/layout/sidebar :: sidebar"></div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="navbar-brand mb-0 h5">Quản lý dự án</span>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-user me-1"></i> <span
+                                th:text="${user}">Admin</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Success Toast -->
+    <div class="toast-container" th:if="${successMessage}">
+        <div class="alert alert-success alert-dismissible fade show shadow-lg" role="alert" id="successAlert"
+            style="min-width: 300px; animation: slideIn 0.3s ease;">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong th:text="${successMessage}">Thành công!</strong>
+            <button type="button" class="btn-close" onclick="document.getElementById('successAlert').remove()"
+                aria-label="Close"></button>
+        </div>
+    </div>
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <main style="margin-top: 58px;">
+        <div class="container-fluid pt-4 px-4">
+            <!-- Filter & Actions -->
+            <div class="card stat-card mb-4">
+                <div class="card-body">
+                    <form class="row g-3 align-items-end" method="get" th:action="@{/admin/projects}">
+                        <div class="col-md-3">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" name="searchTerm" placeholder="Tên dự án..."
+                                th:value="${searchTerm}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Danh mục</label>
+                            <select class="form-select" name="category">
+                                <option value="ALL"
+                                    th:selected="${selectedCategory == 'ALL' or selectedCategory == null}">Tất cả
+                                </option>
+                                <option value="Y tế" th:selected="${selectedCategory == 'Y tế'}">Y tế</option>
+                                <option value="Trẻ em" th:selected="${selectedCategory == 'Trẻ em'}">Trẻ em</option>
+                                <option value="Giáo dục" th:selected="${selectedCategory == 'Giáo dục'}">Giáo dục
+                                </option>
+                                <option value="Thiên tai" th:selected="${selectedCategory == 'Thiên tai'}">Thiên tai
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" name="status">
+                                <option value="ALL" th:selected="${selectedStatus == 'ALL' or selectedStatus == null}">
+                                    Tất cả</option>
+                                <option value="Đang gây quỹ" th:selected="${selectedStatus == 'Đang gây quỹ'}">Đang gây
+                                    quỹ</option>
+                                <option value="Đã đủ quỹ" th:selected="${selectedStatus == 'Đã đủ quỹ'}">Đã đủ quỹ
+                                </option>
+                                <option value="Đã hoàn thành" th:selected="${selectedStatus == 'Đã hoàn thành'}">Đã hoàn
+                                    thành</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-1"></i>
+                                Lọc</button>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <a th:href="@{/admin/projects/create}" class="btn btn-success"><i
+                                    class="fas fa-plus me-1"></i> Thêm dự án</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Project List -->
+            <div class="card stat-card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hình</th>
+                                    <th>Tên dự án</th>
+                                    <th>Danh mục</th>
+                                    <th>Tiến độ</th>
+                                    <th>Thời hạn</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${projects}">
+                                    <td>
+                                        <img th:src="${p.img}" class="project-thumb" alt="Thumbnail"
+                                            onerror="this.src='https://via.placeholder.com/60x45?text=No+Img'">
+                                    </td>
+                                    <td>
+                                        <strong th:text="${#strings.abbreviate(p.title, 35)}">Tên dự án</strong>
+                                        <br><small class="text-muted" th:text="'#' + ${p.code}">#DA001</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark" th:text="${p.displaycategory}">Danh
+                                            mục</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div style="width: 80px;">
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar" role="progressbar"
+                                                        th:style="'width: ' + ${p.progressPercentage} + '%'"
+                                                        th:classappend="${p.progressPercentage >= 100} ? 'bg-success' : ''">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <small class="ms-2" th:text="${p.progressPercentage} + '%'">50%</small>
+                                        </div>
+                                        <small class="text-muted">
+                                            <span
+                                                th:text="${#numbers.formatDecimal(p.amountRaised, 0, 'COMMA', 0, 'POINT')}">0</span>
+                                            /
+                                            <span
+                                                th:text="${#numbers.formatDecimal(p.goalAmount, 0, 'COMMA', 0, 'POINT')}">0</span>₫
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <small
+                                            th:text="${p.startDate != null} ? ${#temporals.format(p.startDate, 'dd/MM')} : '-'">01/01</small>
+                                        -
+                                        <small
+                                            th:text="${p.endDate != null} ? ${#temporals.format(p.endDate, 'dd/MM/yy')} : '-'">31/12/24</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-status"
+                                            th:classappend="${p.status == 'Đang gây quỹ'} ? 'bg-info' : 
+                                                              (${p.status == 'Đã đủ quỹ'} ? 'bg-warning text-dark' : 
+                                                              (${p.status == 'Đã hoàn thành'} ? 'bg-success' : 'bg-secondary'))"
+                                            th:text="${p.status}">Đang gây quỹ</span>
+                                        <!-- Show report badge if has report -->
+                                        <span class="badge bg-primary ms-1" th:if="${p.hasReport()}">
+                                            <i class="fas fa-file-alt"></i>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <!-- Edit button -->
+                                            <a th:href="@{/admin/projects/edit/{id}(id=${p.id})}"
+                                                class="btn btn-outline-primary" title="Sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <!-- Confirm Completion button (only for "Đã đủ quỹ" projects) -->
+                                            <form th:if="${p.status == 'Đã đủ quỹ'}"
+                                                th:action="@{/admin/projects/complete/{id}(id=${p.id})}" method="post"
+                                                style="display:inline;">
+                                                <button type="submit" class="btn btn-success"
+                                                    title="Xác nhận hoàn thành"
+                                                    onclick="return confirm('Xác nhận dự án đã hoàn thành?')">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            </form>
+
+                                            <!-- Report button (only for completed projects) -->
+                                            <a th:if="${p.status == 'Đã hoàn thành'}"
+                                                th:href="@{/admin/projects/report/{id}(id=${p.id})}"
+                                                class="btn btn-outline-success" title="Đăng báo cáo">
+                                                <i class="fas fa-clipboard-check"></i>
+                                            </a>
+
+                                            <!-- Delete button -->
+                                            <button type="button" class="btn btn-outline-danger" th:data-id="${p.id}"
+                                                onclick="confirmDelete(this.getAttribute('data-id'))" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(projects)}">
+                                    <td colspan="7" class="text-center text-muted py-4">Không có dự án nào</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center"
+                    th:if="${totalPages > 1}">
+                    <span class="text-muted">Trang <span th:text="${currentPage + 1}">1</span> / <span
+                            th:text="${totalPages}">1</span></span>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/projects(page=${currentPage - 1}, searchTerm=${searchTerm}, status=${selectedStatus}, category=${selectedCategory})}">Trước</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/projects(page=${currentPage + 1}, searchTerm=${searchTerm}, status=${selectedStatus}, category=${selectedCategory})}">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i> Hướng dẫn:
+                    <span class="badge bg-info me-2">Đang gây quỹ</span> → Tự động chuyển sang
+                    <span class="badge bg-warning text-dark me-2">Đã đủ quỹ</span> khi đạt mục tiêu → Nhấn <i
+                        class="fas fa-check-circle text-success"></i> để xác nhận
+                    <span class="badge bg-success me-2">Đã hoàn thành</span> → Nhấn <i
+                        class="fas fa-clipboard-check text-success"></i> để đăng báo cáo
+                </small>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Auto-hide success message after 3 seconds
+        setTimeout(function () {
+            const alert = document.querySelector('.toast-container .alert');
+            if (alert) {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 3000);
+
+        // Delete confirmation with SweetAlert2
+        function confirmDelete(projectId) {
+            Swal.fire({
+                title: 'Xác nhận xóa dự án?',
+                text: 'Bạn có chắc chắn muốn xóa dự án này? Hành động này không thể hoàn tác!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash"></i> Xóa dự án',
+                cancelButtonText: '<i class="fas fa-times"></i> Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Đang xóa...',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    // Redirect to delete endpoint
+                    window.location.href = '/admin/projects/delete/' + projectId;
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

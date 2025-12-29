@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - UTE Charity</title>
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        @media (min-width: 991.98px) {
+            main {
+                padding-left: 260px;
+            }
+        }
+
+        .stat-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, #ff5858 0%, #f09819 100%);
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge-status {
+            padding: 0.4em 0.8em;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!--Main Navigation-->
+    <header>
+        <!-- Sidebar -->
+        <div th:replace="page_admin/layout/sidebar :: sidebar"></div>
+
+        <!-- Navbar -->
+        <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu"
+                    aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="navbar-brand mb-0 h5">Dashboard</span>
+                <ul class="navbar-nav ms-auto d-flex flex-row">
+                    <li class="nav-item me-3 me-lg-0">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-user me-1"></i> <span th:text="${user}">Admin</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!--Main layout-->
+    <main style="margin-top: 58px;">
+        <div class="container-fluid pt-5 px-4">
+
+            <!-- Global Filter Bar -->
+            <div class="card mb-3 border-0 shadow-sm">
+                <div class="card-body p-2 d-flex align-items-center justify-content-between flex-wrap">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-chart-line me-2"></i>Thống kê tổng quan</h5>
+                    <form action="/admin" method="get" id="filterForm"
+                        class="d-flex align-items-center flex-wrap gap-2">
+                        <!-- Filter Type -->
+                        <select name="filterType" id="filterType" class="form-select form-select-sm"
+                            style="width: auto; min-width: 100px;" onchange="toggleFilterInputs()">
+                            <option value="YEAR" th:selected="${filterType == 'YEAR'}">Theo Năm</option>
+                            <option value="QUARTER" th:selected="${filterType == 'QUARTER'}">Theo Quý</option>
+                            <option value="MONTH" th:selected="${filterType == 'MONTH'}">Theo Tháng</option>
+                            <option value="DAY" th:selected="${filterType == 'DAY'}">Theo Ngày</option>
+                        </select>
+
+                        <!-- Date Input (For DAY) -->
+                        <div id="filterDateContainer" style="display: none;">
+                            <input type="date" name="filterDate" class="form-control form-control-sm"
+                                th:value="${selectedFilterDate}">
+                        </div>
+
+                        <!-- Quarter Select (For QUARTER) -->
+                        <div id="filterQuarterContainer" style="display: none;">
+                            <select name="filterQuarter" class="form-select form-select-sm">
+                                <option value="1" th:selected="${selectedFilterQuarter == 1}">Quý 1</option>
+                                <option value="2" th:selected="${selectedFilterQuarter == 2}">Quý 2</option>
+                                <option value="3" th:selected="${selectedFilterQuarter == 3}">Quý 3</option>
+                                <option value="4" th:selected="${selectedFilterQuarter == 4}">Quý 4</option>
+                            </select>
+                        </div>
+
+                        <!-- Month Select (For MONTH) -->
+                        <div id="filterMonthContainer" style="display: none;">
+                            <select name="filterMonth" class="form-select form-select-sm">
+                                <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}"
+                                    th:text="'Tháng ' + ${m}" th:selected="${m == selectedFilterMonth}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Year Select (For YEAR, QUARTER, MONTH) -->
+                        <div id="filterYearContainer" style="display: none;">
+                            <select name="filterYear" class="form-select form-select-sm">
+                                <option th:each="y : ${#numbers.sequence(2023, 2030)}" th:value="${y}" th:text="${y}"
+                                    th:selected="${y == selectedFilterYear}"></option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm px-3"><i
+                                class="fas fa-filter me-1"></i>Lọc</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Financial Statistics -->
+            <div class="row mb-2">
+                <div class="col-xl-4 col-md-6 mb-2">
+                    <div class="card stat-card h-100">
+                        <div class="card-body p-2">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon bg-gradient-success me-3">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-1 small">Tổng quyên góp <span class="small text-primary"
+                                            th:text="'(' + ${filterTitle} + ')'"></span></p>
+                                    <h4 class="mb-0"><span
+                                            th:text="${#numbers.formatDecimal(totalDonated, 0, 'COMMA', 0, 'POINT')}">0</span>₫
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Disbursed Card REMOVED -->
+                <div class="col-xl-4 col-md-6 mb-2">
+                    <div class="card stat-card h-100">
+                        <div class="card-body p-2">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon bg-gradient-info me-3">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-1 small">Dự án đang chạy</p>
+                                    <h4 class="mb-0" th:text="${countRunning}">0</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-2">
+                    <div class="card stat-card h-100">
+                        <div class="card-body p-2">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon bg-gradient-primary me-3">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-1 small">Đã hoàn thành</p>
+                                    <h4 class="mb-0" th:text="${countCompleted}">0</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <!-- Chart -->
+                <div class="col-lg-6 mb-2">
+                    <div class="card stat-card h-100">
+                        <div
+                            class="card-header bg-white py-2 d-flex flex-wrap justify-content-between align-items-center">
+                            <h6 class="section-title mb-0 me-3"><i class="fas fa-chart-area me-2"></i>Biểu đồ <span
+                                    th:text="${filterTitle}" class="text-muted small"></span></h6>
+
+                        </div>
+                        <div class="card-body p-2" style="height: 250px; overflow: hidden;">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Stats -->
+                <div class="col-lg-6 mb-2">
+                    <div class="card stat-card h-100">
+                        <div class="card-header bg-white py-2">
+                            <h6 class="section-title mb-0"><i class="fas fa-project-diagram me-2"></i>Thống kê dự án
+                            </h6>
+                        </div>
+                        <div class="card-body p-2" style="height: 250px; position: relative;">
+                            <canvas id="projectChart" style="max-height: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Recent Donations -->
+                <div class="col-lg-8 mb-2">
+                    <div class="card stat-card">
+                        <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                            <h6 class="section-title mb-0"><i class="fas fa-donate me-2"></i>Đóng góp gần đây</h6>
+                            <a href="/admin/donations" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Mã GD</th>
+                                            <th>Người đóng góp</th>
+                                            <th>Dự án</th>
+                                            <th>Số tiền</th>
+                                            <th>Thời gian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="donation : ${recentDonations}">
+                                            <td th:text="${donation.orderId}">-</td>
+                                            <td th:text="${donation.user != null ? donation.user.fullname : 'Ẩn danh'}">
+                                                -</td>
+                                            <td th:text="${donation.artical != null ? donation.artical.title : '-'}">-
+                                            </td>
+                                            <td class="text-success fw-bold"
+                                                th:text="${#numbers.formatDecimal(donation.totalPrice, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                                                0₫</td>
+                                            <td
+                                                th:text="${#temporals.format(donation.paymentTime, 'dd/MM/yyyy HH:mm')}">
+                                                -</td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(recentDonations)}">
+                                            <td colspan="5" class="text-center text-muted py-4">Chưa có đóng góp nào
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Support Requests -->
+                <div class="col-lg-4 mb-2">
+                    <div class="card stat-card">
+                        <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                            <h6 class="section-title mb-0"><i class="fas fa-hands-helping me-2"></i>Yêu cầu hỗ trợ</h6>
+                            <a href="/admin/contacts?type=Yêu cầu hỗ trợ" class="btn btn-sm btn-outline-primary">Xem tất
+                                cả</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" th:each="req : ${recentRequests}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong
+                                                th:text="${req.beneficiaryName != null ? req.beneficiaryName : req.user_fullname}">Người
+                                                cần hỗ trợ</strong>
+                                            <p class="text-muted small mb-0"
+                                                th:text="${#strings.abbreviate(req.user_comment, 50)}">Mô tả...</p>
+                                        </div>
+                                        <span class="badge badge-status"
+                                            th:classappend="${req.status == null || req.status == 0} ? 'bg-warning text-dark' : (${req.status == 1} ? 'bg-info' : 'bg-success')"
+                                            th:text="${req.status == null || req.status == 0} ? 'Chờ duyệt' : (${req.status == 1} ? 'Đã duyệt' : 'Đã hoàn tất')">Chờ
+                                            duyệt</span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item text-center text-muted py-4"
+                                    th:if="${#lists.isEmpty(recentRequests)}">
+                                    Chưa có yêu cầu hỗ trợ nào
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        // Common Options
+        Chart.defaults.font.family = "'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+        Chart.defaults.color = '#666';
+
+        // Revenue Chart
+        const chartLabels = /*[[${chartLabels}]]*/[];
+        const chartData = /*[[${chartData}]]*/[];
+
+        // Handle Filter UI
+        function toggleFilterInputs() {
+            const type = document.getElementById('filterType').value;
+            const dateContainer = document.getElementById('filterDateContainer');
+            const monthContainer = document.getElementById('filterMonthContainer');
+            const quarterContainer = document.getElementById('filterQuarterContainer');
+            const yearContainer = document.getElementById('filterYearContainer');
+
+            // Hide all first
+            dateContainer.style.display = 'none';
+            monthContainer.style.display = 'none';
+            quarterContainer.style.display = 'none';
+            yearContainer.style.display = 'none';
+
+            if (type === 'DAY') {
+                dateContainer.style.display = 'block';
+            } else if (type === 'MONTH') {
+                monthContainer.style.display = 'block';
+                yearContainer.style.display = 'block';
+            } else if (type === 'QUARTER') {
+                quarterContainer.style.display = 'block';
+                yearContainer.style.display = 'block';
+            } else if (type === 'YEAR') {
+                yearContainer.style.display = 'block';
+            }
+        }
+        // Init on load
+        toggleFilterInputs();
+
+        const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctxRevenue, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Số tiền quyên góp',
+                    data: chartData,
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)', // Light fill
+                    borderColor: '#667eea',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#667eea',
+                    fill: true,
+                    tension: 0.4 // Smooth curve
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false, // Disable animation to prevent lag
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 10,
+                        titleFont: { size: 13, family: "'Segoe UI', sans-serif" },
+                        bodyFont: { size: 13, family: "'Segoe UI', sans-serif" },
+                        callbacks: {
+                            label: function (context) {
+                                return new Intl.NumberFormat('vi-VN').format(context.raw) + '₫';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f0f0f0',
+                            borderDash: [5, 5],
+                            drawBorder: false // Hide y-axis line
+                        },
+                        ticks: {
+                            font: { size: 10, family: "'Segoe UI', sans-serif" },
+                            callback: function (value) {
+                                if (value >= 1000000) return (value / 1000000) + 'M';
+                                if (value >= 1000) return (value / 1000) + 'K';
+                                return value;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }, // Hide x-axis grid
+                        ticks: {
+                            font: { size: 10, family: "'Segoe UI', sans-serif" }
+                        }
+                    }
+                }
+            }
+        });
+
+
+        // Project Chart
+        const running = /*[[${countRunning}]]*/ 0;
+        const completed = /*[[${countCompleted}]]*/ 0;
+        const ended = /*[[${countEnded}]]*/ 0;
+
+        const ctxProject = document.getElementById('projectChart').getContext('2d');
+        new Chart(ctxProject, {
+            type: 'doughnut',
+            data: {
+                labels: ['Đang chạy', 'Đã hoàn thành', 'Đã kết thúc'],
+                datasets: [{
+                    data: [running, completed, ended],
+                    backgroundColor: ['#4facfe', '#38ef7d', '#adb5bd'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false, // Disable animation
+                plugins: {
+                    legend: {
+                        position: 'right', // Legend on right
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: { size: 11 }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    </script>
+
+</body>
+
+</html>

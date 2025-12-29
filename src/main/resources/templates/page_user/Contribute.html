@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <!-- Intro settings -->
+    <title>Hướng Dẫn Đóng Góp</title>
+    <style>
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            /* Đảm bảo menu luôn nằm trên các thành phần khác */
+            background-color: #ffefdb !important;
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            /* Đảm bảo không có khoảng cách giữa menu và dropdown */
+        }
+
+        /* Dropdown Style */
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        .nav-link.dropdown-toggle {
+            padding: 10px 15px;
+            color: #000;
+            font-weight: 500;
+            border-radius: 50px;
+            /* Tạo hình tròn cho nút dropdown */
+            transition: all 0.3s ease;
+            /* Hiệu ứng chuyển màu mượt mà */
+        }
+
+        /* Hover effect */
+        .nav-link.dropdown-toggle:hover {
+            background-color: #ff6f61;
+            /* Màu nền khi hover */
+            color: white;
+            /* Màu chữ khi hover */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            /* Hiệu ứng bóng đổ */
+        }
+
+        /* Dropdown menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Show dropdown menu on hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Dropdown item */
+        .dropdown-item {
+            padding: 12px 20px;
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect on dropdown items */
+        .dropdown-item:hover {
+            background-color: #ff6f61;
+            color: white;
+            transform: translateX(5px);
+            /* Hiệu ứng chuyển động */
+        }
+
+        /* For small screens */
+        @media (max-width: 768px) {
+            .nav-link.dropdown-toggle {
+                padding: 10px;
+            }
+
+            .dropdown-item {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4" style="margin-top: 100px !important;">HƯỚNG DẪN THANH TOÁN QUA VNPAY</h1>
+        <p class="text-center text-muted">Cảm ơn quý nhà hảo tâm đã đóng góp cho chương trình từ thiện của chúng tôi.
+            Dưới đây là hướng dẫn chi tiết để thanh toán qua VNPAY.</p>
+        <div class="mt-4">
+            <h5 class="mb-3">Bước 1: Chọn dự án bạn muốn đóng góp</h5>
+            <p>Bấm vào dự án bạn muốn đóng góp, đọc chi tiết và kéo xuống cuối bài ấn đóng góp ngay</p>
+        </div>
+        <div class="mt-4">
+            <h5 class="mb-3">Bước 2: Lựa chọn hình thức thanh toán VNPAY</h5>
+            <p>Trên trang thanh toán, vui lòng chọn hình thức thanh toán qua VNPAY. Bạn sẽ được chuyển tới cổng thanh
+                toán của VNPAY để tiếp tục.</p>
+        </div>
+
+        <div class="mt-4">
+            <h5 class="mb-3">Bước 3: Nhập thông tin thanh toán</h5>
+            <p>Tại giao diện VNPAY, vui lòng nhập các thông tin thanh toán bao gồm:</p>
+            <ul>
+                <li>Số tiền cần đóng góp.</li>
+                <li>Thông tin thẻ hoặc tài khoản ngân hàng của bạn.</li>
+                <li>Xác nhận thông tin cá nhân và giao dịch.</li>
+            </ul>
+        </div>
+
+        <div class="mt-4">
+            <h5 class="mb-3">Bước 4: Xác nhận và hoàn tất giao dịch</h5>
+            <p>Sau khi điền đầy đủ thông tin, chọn "Thanh toán". Hệ thống sẽ yêu cầu xác thực qua mã OTP (gửi qua SMS
+                hoặc ứng dụng của ngân hàng). Vui lòng nhập mã OTP để hoàn tất giao dịch.</p>
+        </div>
+
+        <div class="mt-4">
+            <h5 class="mb-3">Bước 5: Xác nhận giao dịch thành công</h5>
+            <p>Sau khi hoàn tất thanh toán, bạn sẽ nhận được thông báo giao dịch thành công. Vui lòng lưu lại biên nhận
+                hoặc mã giao dịch để làm minh chứng cho khoản đóng góp của bạn.</p>
+        </div>
+
+        <div class="mt-4">
+            <h5 class="mb-3">Liên hệ hỗ trợ</h5>
+            <p>Nếu bạn gặp bất kỳ khó khăn nào trong quá trình thanh toán, vui lòng liên hệ với chúng tôi qua email: <a
+                    href="mailto:hethongtuthienUTE@gmail.com">hethongtuthienUTE@gmail.com</a> hoặc số điện thoại:
+                <strong>0123 456 789</strong>.
+            </p>
+        </div>
+    </div>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
+    <script>
+        // Hiệu ứng mở menu thả xuống khi hover
+        document.querySelectorAll('.nav-item.dropdown').forEach(function (dropdown) {
+            dropdown.addEventListener('mouseenter', function () {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.style.display = 'block';
+                menu.style.opacity = '1';
+            });
+
+            dropdown.addEventListener('mouseleave', function () {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.style.opacity = '0';
+                setTimeout(() => (menu.style.display = 'none'), 300);
+            });
+        });
+
+        // Thêm hiệu ứng hover cho các liên kết
+        document.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('mouseenter', function () {
+                this.style.backgroundColor = '#007bff'; // Màu nền hover
+                this.style.color = '#fff'; // Màu chữ khi hover
+            });
+            link.addEventListener('mouseleave', function () {
+                this.style.backgroundColor = ''; // Xóa màu nền hover
+                this.style.color = '#000'; // Màu chữ ban đầu
+            });
+        });
+    </script>
+
+    <!-- Include Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+
+</html>

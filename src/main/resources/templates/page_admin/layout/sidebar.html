@@ -1,0 +1,172 @@
+<nav id="sidebarMenu" class="collapse d-lg-block sidebar bg-white" th:fragment="sidebar">
+    <style>
+        /* Sidebar Container */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 58px 0 0;
+            box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+            width: 260px;
+            z-index: 600;
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        /* Brand Section */
+        .sidebar-brand {
+            padding: 1.5rem 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1976d2;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .sidebar-brand i {
+            font-size: 1.5rem;
+        }
+
+        /* Navigation Items */
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.25rem 0.75rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1rem;
+            color: #495057;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-link i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+            text-align: center;
+            color: #6c757d;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .nav-link:hover i {
+            color: #1976d2;
+        }
+
+        /* Active State */
+        .nav-link.active {
+            background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+            color: #fff !important;
+            box-shadow: 0 4px 15px rgba(25, 118, 210, 0.35);
+        }
+
+        .nav-link.active i {
+            color: #fff !important;
+        }
+
+        /* Divider */
+        .sidebar-divider {
+            height: 0;
+            margin: 1rem 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* Logout Button */
+        .nav-link.logout {
+            color: #dc3545;
+        }
+
+        .nav-link.logout i {
+            color: #dc3545;
+        }
+
+        .nav-link.logout:hover {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .nav-link.logout:hover i {
+            color: #c62828;
+        }
+    </style>
+
+    <div class="position-sticky">
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <i class="fas fa-heart-pulse"></i>
+            <span>UTE Charity</span>
+        </div>
+
+        <!-- Navigation -->
+        <ul class="nav flex-column sidebar-nav">
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'dashboard'} ? 'active'" href="/admin">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'users'} ? 'active'" href="/admin/users">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý tài khoản</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'projects'} ? 'active'" href="/admin/projects">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Quản lý dự án</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'donations'} ? 'active'" href="/admin/donations">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Quản lý đóng góp</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'news'} ? 'active'" href="/admin/news">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Tin tức cộng đồng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'contacts'} ? 'active'" href="/admin/contacts">
+                    <i class="fas fa-envelope"></i>
+                    <span>Quản lý liên hệ</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- Logout -->
+        <ul class="nav flex-column sidebar-nav">
+            <li class="nav-item">
+                <a class="nav-link logout" href="/logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

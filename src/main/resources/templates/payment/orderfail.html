@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán thất bại</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #dc3545 0%, #8b2323 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .fail-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .fail-header {
+            background: linear-gradient(135deg, #dc3545 0%, #8b2323 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .fail-icon {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: shake 0.5s ease;
+        }
+
+        .fail-icon i {
+            font-size: 40px;
+            color: #dc3545;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .fail-body {
+            padding: 30px;
+        }
+
+        .error-box {
+            background: #fff3f3;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, #dc3545 0%, #8b2323 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            width: 100%;
+            color: white;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-retry:hover {
+            color: white;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="fail-card">
+        <div class="fail-header">
+            <div class="fail-icon">
+                <i class="fas fa-times"></i>
+            </div>
+            <h2>Thanh toán thất bại</h2>
+            <p>Giao dịch không thành công</p>
+        </div>
+
+        <div class="fail-body">
+            <div class="error-box" th:if="${error != null}">
+                <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                <span th:text="${error}">Đã xảy ra lỗi</span>
+            </div>
+
+            <div class="info-row" th:if="${orderId != null}">
+                <span class="info-label"><i class="fas fa-file-invoice me-2"></i>Nội dung</span>
+                <span class="info-value" th:text="${orderId}">-</span>
+            </div>
+            <div class="info-row" th:if="${totalPrice != null}">
+                <span class="info-label"><i class="fas fa-money-bill-wave me-2"></i>Số tiền</span>
+                <span class="info-value"
+                    th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">-</span>
+            </div>
+
+            <a href="/thanh-toan" class="btn-retry mt-4">
+                <i class="fas fa-redo me-2"></i>Thử lại
+            </a>
+            <a href="/trang-chu" class="btn btn-outline-secondary btn-block mt-2"
+                style="border-radius: 10px; padding: 12px;">
+                <i class="fas fa-home me-2"></i>Về trang chủ
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+</body>
+
+</html>

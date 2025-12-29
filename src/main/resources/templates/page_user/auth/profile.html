@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ Sơ Của Tôi - Quỹ Từ Thiện UTE</title>
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .profile-header {
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar Placeholder (You should verify if this matches site navbar) -->
+    <!-- Replace placeholder with fragment -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+    <div style="margin-top: 80px;"></div> <!-- Spacer for fixed navbar -->
+
+    <div class="profile-header">
+        <div class="container">
+            <div style="position: relative; display: inline-block;">
+                <img th:src="${user.avatar != null ? user.avatar : 'https://mdbootstrap.com/img/new/avatars/2.jpg'}"
+                    alt="Avatar" class="profile-avatar">
+                <!-- Edit button removed as per request -->
+            </div>
+            <h2 th:text="${user.fullname}">Tên Người Dùng</h2>
+            <p th:text="${user.email}">email@example.com</p>
+
+            <div class="d-flex justify-content-center mt-3">
+                <div class="px-3 border-end">
+                    <h5 th:text="${projectsCount}">0</h5>
+                    <small class="text-white-50">Dự án tham gia</small>
+                </div>
+                <div class="px-3">
+                    <h5 th:text="${#numbers.formatDecimal(totalDonated, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</h5>
+                    <small class="text-white-50">Số tiền ủng hộ</small>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-outline-light btn-rounded btn-sm mt-3" data-bs-toggle="modal"
+                data-bs-target="#editProfileModal">
+                <i class="fas fa-edit me-2"></i>Chỉnh sửa hồ sơ
+            </button>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <!-- Requests Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-4"><i class="fas fa-clipboard-list me-2 text-warning"></i>Các yêu cầu của bạn
+                </h4>
+                <!-- Mockup for statuses as requested -->
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="pills-waiting-tab" data-bs-toggle="pill" href="#pills-waiting"
+                            role="tab" aria-controls="pills-waiting" aria-selected="true">Chờ phê duyệt</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="pills-approved-tab" data-bs-toggle="pill" href="#pills-approved"
+                            role="tab" aria-controls="pills-approved" aria-selected="false">Đã xét duyệt</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="pills-fundraising-tab" data-bs-toggle="pill" href="#pills-fundraising"
+                            role="tab" aria-controls="pills-fundraising" aria-selected="false">Đã hoàn tất</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-waiting" role="tabpanel"
+                        aria-labelledby="pills-waiting-tab">
+                        <div
+                            th:if="${requests == null || requests.isEmpty() || #lists.isEmpty(requests.?[status == 0])}">
+                            <p class="text-muted">Không có yêu cầu nào đang chờ phê duyệt.</p>
+                        </div>
+                        <ul class="list-group list-group-light" th:if="${requests != null}">
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                th:each="req : ${requests}" th:if="${req.status == 0}">
+                                <div>
+                                    <div class="fw-bold"
+                                        th:text="${req.beneficiaryName != null ? req.beneficiaryName : req.user_fullname}">
+                                        Người cần hỗ trợ</div>
+                                    <div class="text-muted small" th:text="${req.user_comment}">Mô tả...</div>
+                                </div>
+                                <span class="badge badge-warning rounded-pill">Chờ duyệt</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="pills-approved" role="tabpanel" aria-labelledby="pills-approved-tab">
+                        <div
+                            th:if="${requests == null || requests.isEmpty() || #lists.isEmpty(requests.?[status == 1])}">
+                            <p class="text-muted">Không có yêu cầu nào đã được xét duyệt.</p>
+                        </div>
+                        <ul class="list-group list-group-light" th:if="${requests != null}">
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                th:each="req : ${requests}" th:if="${req.status == 1}">
+                                <div>
+                                    <div class="fw-bold"
+                                        th:text="${req.beneficiaryName != null ? req.beneficiaryName : req.user_fullname}">
+                                        Người cần hỗ trợ</div>
+                                    <div class="text-muted small" th:text="${req.user_comment}">Mô tả...</div>
+                                </div>
+                                <span class="badge badge-info rounded-pill">Đã duyệt</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="pills-fundraising" role="tabpanel"
+                        aria-labelledby="pills-fundraising-tab">
+                        <div
+                            th:if="${requests == null || requests.isEmpty() || #lists.isEmpty(requests.?[status == 2])}">
+                            <p class="text-muted">Không có yêu cầu nào đã hoàn tất.</p>
+                        </div>
+                        <ul class="list-group list-group-light" th:if="${requests != null}">
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                th:each="req : ${requests}" th:if="${req.status == 2}">
+                                <div>
+                                    <div class="fw-bold"
+                                        th:text="${req.beneficiaryName != null ? req.beneficiaryName : req.user_fullname}">
+                                        Người cần hỗ trợ</div>
+                                    <div class="text-muted small" th:text="${req.user_comment}">Mô tả...</div>
+                                </div>
+                                <span class="badge badge-success rounded-pill">Đã hoàn tất</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container my-5">
+            <div class="row">
+                <!-- Donation History -->
+                <div class="col-md-8 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4"><i class="fas fa-history me-2 text-primary"></i>Lịch sử Quyên
+                                góp
+                            </h4>
+                            <!-- Check if history exists -->
+                            <div th:if="${donationHistory == null or donationHistory.empty}">
+                                <p class="text-muted">Bạn chưa có giao dịch quyên góp nào.</p>
+                                <a href="/du-an" class="btn btn-primary btn-sm">Ủng hộ ngay</a>
+                            </div>
+                            <div th:if="${donationHistory != null and !donationHistory.empty}" class="table-responsive">
+                                <table class="table align-middle mb-0 bg-white">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Dự án</th>
+                                            <th>Số tiền</th>
+                                            <th>Ngày</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="payment : ${donationHistory}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="ms-3">
+                                                        <p class="fw-bold mb-1"
+                                                            th:text="${payment.artical != null ? payment.artical.title : 'Dự án không tồn tại'}">
+                                                            Tên
+                                                            dự án
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-success fw-bold"
+                                                    th:text="${payment.totalPrice} + ' VNĐ'">500.000 VNĐ</span>
+                                            </td>
+                                            <td th:text="${#temporals.format(payment.paymentTime, 'dd/MM/yyyy HH:mm')}">
+                                                12/12/2024</td>
+                                            <td>
+                                                <span class="badge rounded-pill d-inline"
+                                                    th:classappend="${payment.paymentStatus == 1 ? 'badge-success' : 'badge-warning'}"
+                                                    th:text="${payment.paymentStatus == 1 ? 'Thành công' : 'Đang xử lý'}">Thành
+                                                    công</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Followed Projects -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4"><i class="fas fa-heart me-2 text-danger"></i>Dự án đang theo dõi
+                            </h4>
+                            <div th:if="${followedProjects == null or followedProjects.empty}">
+                                <p class="text-muted">Chưa theo dõi dự án nào.</p>
+                            </div>
+                            <ul class="list-group list-group-light"
+                                th:if="${followedProjects != null and !followedProjects.empty}">
+                                <li class="list-group-item d-flex justify-content-between align-items-center"
+                                    th:each="follow : ${followedProjects}">
+                                    <div>
+                                        <h6 class="fw-bold mb-1"><a
+                                                th:href="@{'/du-an/' + ${follow.project != null ? follow.project.id : '#'}}"
+                                                th:text="${follow.project != null ? follow.project.title : 'Dự án không tồn tại'}"
+                                                class="text-dark">Tên Dự Án</a></h6>
+                                    </div>
+                                    <span class="badge badge-primary rounded-pill">Theo dõi</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Modal -->
+        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/update-profile}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editProfileModalLabel">Chỉnh sửa hồ sơ</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Username (Read-only) -->
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Tên tài khoản</label>
+                                <input type="text" class="form-control" th:value="${user.username}" disabled>
+                            </div>
+                            <!-- Full Name -->
+                            <div class="mb-3">
+                                <label for="fullname" class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" id="fullname" name="fullname"
+                                    th:value="${user.fullname}" required>
+                            </div>
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                    th:value="${user.email}" required>
+                            </div>
+
+                            <!-- Change Password Button -->
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                    data-bs-target="#changePasswordModal">
+                                    <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Modal -->
+        <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/change-password}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="changePasswordModalLabel">Đổi mật khẩu</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="oldPassword" class="form-label">Mật khẩu cũ</label>
+                                <input type="password" class="form-control" id="oldPassword" name="oldPassword"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                                <input type="password" class="form-control" id="newPassword" name="newPassword"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Cập nhật mật khẩu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer script -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function () {
+                const urlParams = new URLSearchParams(window.location.search);
+
+                // Password Success
+                if (urlParams.get('passwordSuccess') === 'true') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: 'Đổi mật khẩu thành công.',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                // Password Error
+                const passwordError = urlParams.get('passwordError');
+                if (passwordError) {
+                    let message = 'Có lỗi xảy ra.';
+                    if (passwordError === 'wrong_old_password') message = 'Mật khẩu cũ không chính xác.';
+                    else if (passwordError === 'password_mismatch') message = 'Mật khẩu xác nhận không khớp.';
+                    else if (passwordError === 'system_error') message = 'Lỗi hệ thống. Vui lòng thử lại sau.';
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: message,
+                    });
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            });
+        </script>
+
+
+</body>
+
+</html>

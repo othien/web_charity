@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${campaign.title} + ' - Quỹ từ thiện UTE'">Chi tiết dự án - Quỹ từ thiện UTE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #e74c3c;
+            --primary-dark: #c0392b;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --dark-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Hero Section */
+        .campaign-hero {
+            position: relative;
+            height: 500px;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 0;
+        }
+
+        .campaign-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 80px;
+        }
+
+        .campaign-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+
+        .campaign-category {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .campaign-meta {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .campaign-meta i {
+            margin-right: 8px;
+        }
+
+        /* Floating Stats Card */
+        .stats-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+            padding: 30px 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .stat-item h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-item.raised h3 {
+            color: var(--primary-color);
+        }
+
+        .stat-item.goal h3 {
+            color: var(--dark-color);
+        }
+
+        .stat-item.donors h3 {
+            color: var(--success-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress {
+            height: 12px;
+            border-radius: 10px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, var(--success-color) 0%, #2ecc71 100%);
+            border-radius: 10px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 0 60px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .content-section {
+            padding: 40px;
+        }
+
+        .content-section p {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            color: #444;
+            text-align: justify;
+            white-space: pre-line;
+        }
+
+        .content-section img {
+            width: 100%;
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar */
+        .sidebar-card {
+            position: sticky;
+            top: 100px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .sidebar-header h4 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .sidebar-body {
+            padding: 25px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .status-badge.active {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .status-badge.completed {
+            background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);
+            color: white;
+        }
+
+        .status-badge.ended {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-donate {
+            display: block;
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-donate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+            color: white;
+        }
+
+        /* Donor List */
+        .donor-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .donor-header {
+            background: #f8f9fa;
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .donor-header h5 {
+            margin: 0;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .donor-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .donor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            border-bottom: 1px solid #f1f1f1;
+            transition: background 0.2s;
+        }
+
+        .donor-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .donor-name {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 3px;
+        }
+
+        .donor-time {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .donor-amount {
+            background: var(--success-color);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Report Section */
+        .report-card {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, var(--success-color) 0%, #2ecc71 100%);
+            color: white;
+            padding: 20px 30px;
+        }
+
+        /* Heart Button */
+        .heart-btn {
+            position: absolute;
+            bottom: 100px;
+            right: 30px;
+            z-index: 5;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .heart-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .campaign-hero {
+                height: 400px;
+            }
+
+            .campaign-title {
+                font-size: 1.8rem;
+            }
+
+            .stats-card {
+                margin: -40px 15px 0;
+                padding: 20px;
+            }
+
+            .stat-item h3 {
+                font-size: 1.3rem;
+            }
+
+            .content-section {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Include Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Hero Section -->
+    <section class="campaign-hero" th:style="'background-image: url(' + ${campaign.img} + ');'">
+        <div class="container hero-content">
+            <span class="campaign-category" th:text="${campaign.displaycategory}">Danh mục</span>
+            <h1 class="campaign-title" th:text="${campaign.title}">Tiêu đề dự án</h1>
+            <div class="campaign-meta">
+                <span><i class="far fa-calendar-alt"></i>
+                    <span
+                        th:text="${#temporals.format(campaign.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(campaign.endDate, 'dd/MM/yyyy')}">Thời
+                        gian</span>
+                </span>
+                <span><i class="fas fa-users"></i> <span th:text="${donors.size()}">0</span> lượt ủng hộ</span>
+            </div>
+        </div>
+
+        <!-- Heart Button -->
+        <a th:href="@{'/follow-project?id=' + ${campaign.id}}" class="heart-btn">
+            <i
+                th:class="${followedProjectIds != null and followedProjectIds.contains(campaign.id)} ? 'fas fa-heart text-danger fa-2x' : 'far fa-heart text-white fa-2x'"></i>
+        </a>
+    </section>
+
+    <!-- Stats Card (Floating) -->
+    <div class="container">
+        <div class="stats-card">
+            <div class="row align-items-center">
+                <div class="col-md-3 col-4">
+                    <div class="stat-item raised">
+                        <h3 th:text="${#numbers.formatDecimal(campaign.amountRaised, 0, 'COMMA', 0, 'POINT')}">0</h3>
+                        <span class="stat-label">VNĐ đã quyên góp</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-4">
+                    <div class="stat-item goal">
+                        <h3 th:text="${#numbers.formatDecimal(campaign.goalAmount, 0, 'COMMA', 0, 'POINT')}">0</h3>
+                        <span class="stat-label">VNĐ mục tiêu</span>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4">
+                    <div class="stat-item donors">
+                        <h3 th:text="${donors.size()}">0</h3>
+                        <span class="stat-label">Lượt ủng hộ</span>
+                    </div>
+                </div>
+                <div class="col-md-4 d-none d-md-block">
+                    <div class="progress-container">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar"
+                                th:style="'width: ' + ${campaign.goalAmount > 0 ? (campaign.amountRaised * 100.0 / campaign.goalAmount) : 0} + '%'">
+                            </div>
+                        </div>
+                        <div class="progress-label">
+                            <span
+                                th:text="${campaign.goalAmount > 0 ? #numbers.formatDecimal((campaign.amountRaised * 100.0 / campaign.goalAmount), 0, 'COMMA', 1, 'POINT') : 0} + '%'">0%</span>
+                            <span>hoàn thành</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <section class="main-content">
+        <div class="container">
+            <div class="row">
+                <!-- Left Column: Content -->
+                <div class="col-lg-8 mb-4">
+                    <div class="content-card">
+                        <div class="content-section" th:if="${detail != null}">
+                            <div th:if="${detail.content_1}">
+                                <p th:text="${detail.content_1}"></p>
+                            </div>
+
+                            <div
+                                th:if="${detail.img_content != null and #strings.startsWith(detail.img_content, 'http')}">
+                                <img th:src="${detail.img_content}" alt="Hình ảnh minh họa 1"
+                                    onerror="this.parentElement.style.display='none'">
+                            </div>
+
+                            <div th:if="${detail.content_2}">
+                                <p th:text="${detail.content_2}"></p>
+                            </div>
+
+                            <div
+                                th:if="${detail.img_content2 != null and #strings.startsWith(detail.img_content2, 'http')}">
+                                <img th:src="${detail.img_content2}" alt="Hình ảnh minh họa 2"
+                                    onerror="this.parentElement.style.display='none'">
+                            </div>
+
+                            <div th:if="${detail.content_3}">
+                                <p th:text="${detail.content_3}"
+                                    style="font-weight: 500; font-style: italic; color: #666;"></p>
+                            </div>
+                        </div>
+                        <div class="content-section text-center" th:unless="${detail != null}">
+                            <p class="text-muted mb-0"><i class="fas fa-spinner fa-spin me-2"></i>Nội dung chi tiết đang
+                                được cập nhật...</p>
+                        </div>
+                    </div>
+
+                    <!-- Project Report Section -->
+                    <div class="content-card report-card mt-4" th:if="${campaign.hasReport()}">
+                        <div class="report-header">
+                            <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Báo cáo dự án</h5>
+                        </div>
+                        <div class="content-section">
+                            <div th:if="${campaign.reportImage != null}" class="text-center mb-4">
+                                <img th:src="${campaign.reportImage}" alt="Báo cáo dự án"
+                                    style="max-height: 400px; width: auto;">
+                            </div>
+                            <div th:if="${campaign.reportContent != null}">
+                                <p th:text="${campaign.reportContent}"></p>
+                            </div>
+                            <div class="alert alert-success mt-4 mb-0">
+                                <i class="fas fa-heart me-2"></i>
+                                <strong>Cảm ơn tất cả các nhà hảo tâm đã đồng hành cùng dự án!</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Sidebar -->
+                <div class="col-lg-4">
+                    <div class="sidebar-card">
+                        <div class="sidebar-header">
+                            <h4><i class="fas fa-hand-holding-heart me-2"></i>Đồng hành cùng dự án</h4>
+                        </div>
+                        <div class="sidebar-body">
+                            <!-- Status Badge -->
+                            <div class="text-center mb-4">
+                                <span th:if="${campaign.active and !campaign.goalReached}" class="status-badge active">
+                                    <i class="fas fa-hand-holding-heart me-2"></i>Đang gây quỹ
+                                </span>
+                                <span th:if="${campaign.goalReached}" class="status-badge completed">
+                                    <i class="fas fa-check-circle me-2"></i>Đã đạt mục tiêu
+                                </span>
+                                <span th:if="${!campaign.active and !campaign.goalReached}" class="status-badge ended">
+                                    <i class="fas fa-clock me-2"></i>Đã kết thúc
+                                </span>
+                            </div>
+
+                            <!-- Message -->
+                            <p class="text-center text-muted mb-4" th:if="${campaign.active and !campaign.goalReached}">
+                                Mọi sự đóng góp của bạn đều rất quý giá!
+                            </p>
+                            <p class="text-center text-success mb-4" th:if="${campaign.goalReached}">
+                                <i class="fas fa-trophy me-2"></i>Dự án đã đạt mục tiêu! Cảm ơn các nhà hảo tâm.
+                            </p>
+                            <p class="text-center text-muted mb-4"
+                                th:if="${!campaign.active and !campaign.goalReached}">
+                                Dự án đã kết thúc nhận quyên góp.
+                            </p>
+
+                            <!-- Donate Button -->
+                            <a th:if="${campaign.active and !campaign.goalReached}"
+                                th:href="@{/donate(projectId=${campaign.id})}" class="btn-donate">
+                                <i class="fas fa-heart me-2"></i>Quyên góp ngay
+                            </a>
+
+                            <!-- Bank Transfer Info -->
+                            <div class="text-center mt-4" th:if="${campaign.active and !campaign.goalReached}">
+                                <small class="text-muted">
+                                    Hoặc chuyển khoản với nội dung:<br>
+                                    <strong class="text-primary"
+                                        th:text="${campaign.code != null ? campaign.code : 'Mã dự án'}">Mã dự
+                                        án</strong>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Donor List -->
+                    <div class="donor-card">
+                        <div class="donor-header">
+                            <h5><i class="fas fa-users me-2"></i>Danh sách nhà hảo tâm</h5>
+                        </div>
+                        <div class="donor-list">
+                            <div th:each="donor : ${donors}" class="donor-item">
+                                <div>
+                                    <div class="donor-name"
+                                        th:text="${donor.user != null ? donor.user.fullname : 'Ẩn danh'}">Nguyễn Văn A
+                                    </div>
+                                    <div class="donor-time"
+                                        th:text="${#temporals.format(donor.paymentTime, 'dd/MM/yyyy HH:mm')}">12:30
+                                        20/10/2023</div>
+                                </div>
+                                <span class="donor-amount"
+                                    th:text="${#numbers.formatDecimal(donor.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">500,000
+                                    đ</span>
+                            </div>
+                            <div th:if="${donors.empty}" class="text-center py-4 text-muted">
+                                <i class="far fa-smile-wink fa-2x mb-2"></i><br>
+                                Chưa có lượt quyên góp. Hãy là người đầu tiên!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Include Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.js"></script>
+</body>
+
+</html>
